@@ -42,14 +42,59 @@ router.post('/fetch',async (req,res)=>{
 });
 
 router.get('/prod/:id',async (req,res)=>{
-    const ids = req.params.id;
-    const product = await Product.findOne({ _id : ids });
-    res.render('productDetails' , { product });
+    try{
+        const ids = req.params.id;
+        const product = await Product.findOne({ _id : ids });
+        res.render('productDetails' , { product });
+    }catch(error){
+        return res.status(500).send(error);
+    }   
 });
 
-// router.get('/men',async (req,res)=>{
-//     const product = await Product.find({ category : 'Men' });
-//     res.render('category',{ product });
-// });
+router.get('/all',async (req,res)=>{
+    try{
+        const product = await Product.find();
+        res.render('category',{ products : product });
+    }catch(error){
+        return res.status(500).send(error);
+    }
+});
+
+router.get('/men',async (req,res)=>{
+    try{
+        const product = await Product.find({ category : 'Men' });
+        res.render('category',{ products : product });
+    }catch(error){
+        return res.status(500).send(error);
+    }
+});
+
+router.get('/women',async (req,res)=>{
+    try{
+        const product = await Product.find({ category : 'Women' });
+        res.render('category',{ products : product });
+    }catch(error){
+        returnres.status(500).send(error);
+    }
+});
+
+router.get('/unisex',async (req,res)=>{
+    try{
+        const product = await Product.find({ category : 'Unisex' });
+        res.render('category',{ products : product });
+    }catch(error){
+        returnres.status(500).send(error);
+    }
+});
+
+router.get('/footwear',async (req,res)=>{
+    try{
+        const product = await Product.find({ category : 'Shoes' });
+        res.render('category',{ products : product });
+    }catch(error){
+        returnres.status(500).send(error);
+    }
+});
+
 
 module.exports = router;

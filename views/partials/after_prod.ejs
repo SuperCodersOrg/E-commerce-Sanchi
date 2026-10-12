@@ -1,5 +1,5 @@
 <% product.forEach((item) => { %>
-    <div class="product-card" data-id="<%= item.id %>">
+    <div class="product-card" data-id="<%= item._id %>">
         <img src="<%= item.image %>" alt="<%= item.description %>"/>
         <h2><%= item.name %></h2>
         <a href="/prod/<%= item._id %>"><button>View details</button></a>

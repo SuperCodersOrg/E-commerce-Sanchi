@@ -1,20 +1,24 @@
-<!-- <header>
-    <div>
-        <h3 id="website_name">VELNORA</h3>
-        <span id="user_img"><img src="/logo.png"/></span>
-        <div id="user_name">
-            <% if(name) { %>
-                <span><%= name %></span>
-            <% } %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+    <header>
+        <%- include('./partials/header') %>
+    </header>
+    <div id="products">
+    <%  products.forEach((item) => { %>
+        <div class="product-card" data-id="<%= item._id %>">
+            <img src="<%= item.image %>" alt="<% item.description %>"/>
+            <h2><%= item.name %></h2>
+            <a href="/prod/<%= item._id %>"><button>View details</button></a>
         </div>
-    </div>
-    <%- include('./partials/header') %>
-</header> -->
-<div id="products">
-    <%  Products.forEach((product,index) => { %>
-        <img src="<%= product.image %>" alt="<% product.description %>"/>
-        <h2><%= product.name %></h2>
-        <a href="/prod/<%= product._id %>"><button>View details</button></a>
-    <% }) %>    
+    <% }) %> 
 </div>
 <button id="load_btn" type="button">Load more products...</button>
+</body>
+</html>
