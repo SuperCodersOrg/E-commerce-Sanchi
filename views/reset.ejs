@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+    <form id="reset_form" method="POST" action="/reset-password/<%= token %>">
+        <input id="reset_new_pass" type="password" name="newPass" placeholder="Enter new password" required/>
+        <input id="reset_confm_pass" type="password" name="confirmPass" placeholder="Confirm new password" required/>
+        <button id="reset_submit" type="submit">Reset password</button>
+    </form>
+</body>
+</html>

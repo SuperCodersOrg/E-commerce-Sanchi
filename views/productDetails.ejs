@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+    <% if(product) { %>
+        <main id="product_details">
+            <div id="product_details_left">
+                <img src="<%= product.image %>" alt="<%= product.description %>"/>
+                <h2><%= product.name %></h3>
+                <h3><%= product.title %></h2>
+            </div>
+            <div id="product_details_right">
+                <div id="product_breadcrumb"> VELNORA / <%= product.category %> </div>
+                <h2><%= product.name %></h2>
+                <div id="price">$<%= product.price %></div> 
+                <div id="select_size">Select Size</div>
+                <div id="product_sizes">
+                    <% product.size.forEach((size)=>{ %>
+                        <span class="size"><%= size %></span>
+                    <% }) %>
+                </div>
+                <button id="add_to_cart">ADD TO CART</button>
+                <div id="brand">Brand: <%= product.brand %></div>   
+            </div>
+        </main>
+    <% } %>
+</body>
+</html>

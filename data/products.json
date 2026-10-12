@@ -1,0 +1,203 @@
+
+[
+  {
+    "name": "Floral Midi Dress",
+    "image": "/public/images/floral_midi.png",
+    "title": "Women's Floral Midi Dress",
+    "description": "Elegant floral midi dress with a flowing silhouette, suitable for casual outings and brunch.",
+    "price": 1299,
+    "size": ["XS", "S", "M", "L", "XL"],
+    "brand": "ONLY",
+    "category": "Dresses"
+  },
+  {
+    "name": "Satin Evening Dress",
+    "image": "/public/images/satin_evening.png",
+    "title": "Women's Satin Evening Dress",
+    "description": "Sophisticated satin-finish dress for evening events and special occasions.",
+    "price": 1999,
+    "size": ["XS", "S", "M", "L", "XL"],
+    "brand": "AND",
+    "category": "Dresses"
+  },
+  {
+    "name": "Classic Shirt Dress",
+    "image": "/public/images/classic_shirt.png",
+    "title": "Women's Minimal Shirt Dress",
+    "description": "A versatile collared dress with a button-down front and clean minimalist styling.",
+    "price": 1499,
+    "size": ["XS", "S", "M", "L", "XL"],
+    "brand": "H&M",
+    "category": "Dresses"
+  },
+  {
+    "name": "Printed Skirt",
+    "image": "/public/images/printed_skirt.png",
+    "title": "Women's Printed Skirt",
+    "description": "Full-length printed skirt with a graceful fit for relaxed daytime styling.",
+    "price": 1799,
+    "size": ["XS", "S", "M", "L", "XL"],
+    "brand": "VERO MODA",
+    "category": "Dresses"
+  },
+  {
+    "name": "Black Party Dress",
+    "image": "/public/images/black_party.png",
+    "title": "Women's Classic Black Party Dress",
+    "description": "A timeless black dress with a refined silhouette for dinners and celebrations.",
+    "price": 2299,
+    "size": ["XS", "S", "M", "L", "XL"],
+    "brand": "ONLY",
+    "category": "Dresses"
+  },
+  {
+    "name": "Slim-Fit Jeans",
+    "image": "/public/images/men's-slim-fit-jeans.png",
+    "title": "Men's Slim-Fit Stretch Denim Jeans",
+    "description": "Versatile slim-fit denim with stretch for comfortable everyday wear.",
+    "price": 1999,
+    "size": ["28", "30", "32", "34", "36"],
+    "brand": "Lee",
+    "category": "Jeans"
+  },
+  {
+    "name": "Relaxed Blue Jeans",
+    "image": "/public/images/products/men's-blue-jeans.png",
+    "title": "Men's Relaxed-Fit Blue Jeans",
+    "description": "Relaxed denim with a classic five-pocket design and casual styling.",
+    "price": 1299,
+    "size": ["28", "30", "32", "34", "36"],
+    "brand": "Roadster",
+    "category": "Jeans"
+  },
+  {
+    "name": "Oversized Graphic Tee",
+    "image": "/public/images/oversized-graphic-tea.png",
+    "title": "Men's Oversized Graphic T-Shirt",
+    "description": "Relaxed-fit graphic T-shirt suited to contemporary streetwear outfits.",
+    "price": 799,
+    "size": ["S", "M", "L", "XL", "XXL"],
+    "brand": "Roadster",
+    "category": "Tops"
+  },
+  {
+    "name": "Classic Polo Shirt",
+    "image": "/public/images/polo-tshirts.png",
+    "title": "Men's Classic Collar Polo T-Shirt",
+    "description": "A versatile polo shirt with a collar and short sleeves for smart-casual wear.",
+    "price": 999,
+    "size": ["S", "M", "L", "XL", "XXL"],
+    "brand": "U.S. Polo Assn.",
+    "category": "Men's Clothing"
+  },
+  {
+    "name": "Checked Casual Shirt",
+    "image": "/public/images/checked_shirt.png",
+    "title": "Men's Checked Button-Down Shirt",
+    "description": "A long-sleeve checked shirt for casual outings and weekend styling.",
+    "price": 1299,
+    "size": ["S", "M", "L", "XL", "XXL"],
+    "brand": "Allen Solly",
+    "category": "Men's Clothing"
+  },
+  {
+    "name": "Oversized Hoodie",
+    "image": "/public/images/hoodie.png",
+    "title": "Unisex Oversized Streetwear Hoodie",
+    "description": "A relaxed oversized hoodie with a roomy fit and kangaroo pocket.",
+    "price": 1799,
+    "size": ["S", "M", "L", "XL", "XXL"],
+    "brand": "H&M",
+    "category": "Hoodies"
+  },
+  {
+    "name": "Zip-Up Sports Hoodie",
+    "image": "/public/images/zip-up-hoodie.png",
+    "title": "Unisex Full-Zip Sports Hoodie",
+    "description": "A sporty hooded layer with a full zip, long sleeves and side pockets.",
+    "price": 1999,
+    "size": ["S", "M", "L", "XL", "XXL"],
+    "brand": "Puma",
+    "category": "Hoodies"
+  },
+  {
+    "name": "Essential Minimal Hoodie",
+    "image": "/public/images/essential.png",
+    "title": "Unisex Minimal Solid-Colour Hoodie",
+    "description": "A simple solid-colour hoodie designed for everyday wear and layering.",
+    "price": 999,
+    "size": ["S", "M", "L", "XL", "XXL"],
+    "brand": "Bewakoof",
+    "category": "Hoodies"
+  },
+  {
+    "name": "Classic Denim Jacket",
+    "image": "/public/images/denim.png",
+    "title": "Unisex Classic Blue Denim Jacket",
+    "description": "A timeless denim jacket with a button front and practical chest pockets.",
+    "price": 2499,
+    "size": ["S", "M", "L", "XL", "XXL"],
+    "brand": "Levi's",
+    "category": "Jackets"
+  },
+  {
+    "name": "Varsity Jacket",
+    "image": "/public/images/varsity.png",
+    "title": "Unisex Varsity-Style Jacket",
+    "description": "A sporty varsity-inspired jacket with contrast trim and a button front.",
+    "price": 2499,
+    "size": ["S", "M", "L", "XL", "XXL"],
+    "brand": "H&M",
+    "category": "Jackets"
+  },
+  {
+    "name": "White Everyday Sneakers",
+    "image": "/public/images/white_sneakers.png",
+    "title": "Unisex White Casual Sneakers",
+    "description": "Minimal lace-up sneakers designed for everyday outfits and casual styling.",
+    "price": 2499,
+    "size": ["UK 5", "UK 6", "UK 7", "UK 8", "UK 9", "UK 10"],
+    "brand": "Adidas",
+    "category": "Shoes"
+  },
+  {
+    "name": "Running Shoes",
+    "image": "/public/images/running_shoes.png",
+    "title": "Men's Lightweight Running Shoes",
+    "description": "Lightweight sports shoes with a cushioned sole for running and training.",
+    "price": 2999,
+    "size": ["UK 6", "UK 7", "UK 8", "UK 9", "UK 10", "UK 11"],
+    "brand": "Puma",
+    "category": "Shoes"
+  },
+  {
+    "name": "Canvas Lace-Up Shoes",
+    "image": "/public/images/lace_up.png",
+    "title": "Unisex Casual Canvas Shoes",
+    "description": "Classic canvas lace-up shoes with a low-profile rubber sole.",
+    "price": 1499,
+    "size": ["UK 5", "UK 6", "UK 7", "UK 8", "UK 9", "UK 10"],
+    "brand": "Converse",
+    "category": "Shoe`s"
+  },
+  {
+    "name": "Comfort Walking Shoes",
+    "image": "/public/images/walking.png",
+    "title": "Men's Everyday Comfort Walking Shoes",
+    "description": "Casual walking shoes with a cushioned footbed and flexible sole.",
+    "price": 1999,
+    "size": ["UK 6", "UK 7", "UK 8", "UK 9", "UK 10", "UK 11"],
+    "brand": "Campus",
+    "category": "Shoes"
+  },
+  {
+    "name": "Classic Casual Loafers",
+    "image": "/public/images/loafers.png",
+    "title": "Men's Classic Slip-On Loafers",
+    "description": "Smart-casual slip-on shoes suitable for everyday and semi-formal outfits.",
+    "price": 1799,
+    "size": ["UK 6", "UK 7", "UK 8", "UK 9", "UK 10", "UK 11"],
+    "brand": "Bata",
+    "category": "Shoes"
+  }
+]

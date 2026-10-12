@@ -1,0 +1,20 @@
+<!-- <header>
+    <div>
+        <h3 id="website_name">VELNORA</h3>
+        <span id="user_img"><img src="/logo.png"/></span>
+        <div id="user_name">
+            <% if(name) { %>
+                <span><%= name %></span>
+            <% } %>
+        </div>
+    </div>
+    <%- include('./partials/header') %>
+</header> -->
+<div id="products">
+    <%  Products.forEach((product,index) => { %>
+        <img src="<%= product.image %>" alt="<% product.description %>"/>
+        <h2><%= product.name %></h2>
+        <a href="/prod/<%= product._id %>"><button>View details</button></a>
+    <% }) %>    
+</div>
+<button id="load_btn" type="button">Load more products...</button>
