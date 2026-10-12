@@ -343,8 +343,7 @@ header > div{
 }
 
 #load_btn {
-    display: block;
-    margin: 20px 40px 35px auto;
+    margin: 0px 0px 35px calc(100% - 20%);
     padding: 13px 24px;
     background-color: #702c3b;
     color: #fffaf7;

@@ -21,44 +21,51 @@
     </header>
     <div id="products">
         <%  Products.forEach((product,index) => { %>
-            <!-- <div class="product-card"> -->
-            <div class="product-card">
+            <div class="product-card" data-id="<%= product.id %>">
                 <img src="<%= product.image %>" alt="<% product.description %>"/>
                 <h2><%= product.name %></h2>
                 <a href="/prod/<%= product._id %>"><button>View details</button></a>
             </div>
         <% }) %> 
-        <!-- <%- include('./partials/after_prod') %>    -->
     </div>
     <button id="load_btn" type="button">Load more products...</button>
 </body>
 <script>
-    // let product_cards = document.querySelectorAll('.product-card');
     let load_btn = document.getElementById('load_btn');
     let productDiv = document.getElementById("products");
-    // let count = 4;
-    load_btn.addEventListener("click",()=>{
-        let id = "<%= Products[Products.length-1]._id %>";
+    load_btn.addEventListener("click",async ()=>{
+        let product_cards = document.querySelectorAll('.product-card');
+        
+        if(!product_cards){
+            return res.status(401).send('No product can be found');
+        }
+
+        console.log(product_cards);
+
+        let lastCard =  product_cards[product_cards.length-1] ;
+        let id = lastCard.dataset.id;
         console.log(id);
-        fetch(`http://localhost:<%= process.env.PORT %>/fetch`,{
+
+        const result = await fetch(`/fetch`,{
             method : 'POST',
             headers : {
                 'Content-Type' : 'application/json',
             },
-            body : JSON.stringify({ '_id' : id })
-        }).then((result)=>{
-            return result.text();
-        }).then((html)=>{
-            productDiv.insertAdjacentHTML('beforeend',html);
-        })
-        // let nextCount = count + 4;
-        // for(let i=count ; i<nextCount ; i++){
-        //     product_cards[i].hidden = false;
-        // }
-        // count = nextCount;
-        // if(count >= product_cards.length ){
-        //     load_btn.hidden = true;
-        // }
+            body : JSON.stringify({ _id : id })
+        });
+
+        if(!result.ok){
+            return;
+        }
+            
+        let html = await result.text();
+            
+        if(!html.trim()){
+            load_btn.hidden = true;
+            return;
+        }
+
+        productDiv.insertAdjacentHTML('beforeend',html);
     });
 </script>
 </html>

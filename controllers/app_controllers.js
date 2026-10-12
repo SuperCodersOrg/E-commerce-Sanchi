@@ -12,7 +12,10 @@ const authenticated = require('../middlewares/protected_route_middleware');
 
 router.get('/dashboard/:name', authenticated, async (req,res)=>{
     try{
-        const Products = await Product.find().sort({ _id : 1 }).limit(4);
+        const Products = await Product.find()
+                    .sort({ _id : 1 })
+                    .limit(4);
+
         res.render('dashboard' ,  { 
             name : req.params.name,
             Products
@@ -24,10 +27,18 @@ router.get('/dashboard/:name', authenticated, async (req,res)=>{
 });
 
 router.post('/fetch',async (req,res)=>{
-    console.log(req.body);
-    console.log(req.body._id);   
-    const product = await Product.find({ _id : { $gt : req.body._id } }).sort({ _id : 1 }).limit(4);
-    // res.render('../partials/after_prod',{ product : product });
+    try{
+        const products = await Product.find({ _id : { $gt : req.body._id } })
+                    .sort({ _id : 1 })
+                    .limit(4) ;
+
+        if(products.length === 0 ){
+            return res.send('');
+        }
+        res.render('partials/after_prod',{ product : products });
+    }catch(error){
+        return res.status(500).send(error);
+    }
 });
 
 router.get('/prod/:id',async (req,res)=>{
