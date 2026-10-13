@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+    <%- include('./partials/nameHeader') %>
+    <div id="head-cart">
+        <div>VELNORA</div>
+        <div>SHOPPING BAG</div>
+    </div>
+
+    <div id="mid-cart">
+        <h2>Your shopping bag</h2>
+        <h3>Review your selections before checkout.</h3>
+    </div>
+
+    <div id="cartProducts">
+
+        <% products.forEach((item)=>{ %>
+            <div class="card">
+
+                <div class="card-left">
+                    <img src="<%= item.image %>" alt="<%= item.description %>"/>
+                </div>
+
+                <div class="card-right">
+                    <h2 class="card-name">VELNORA . <%= item.category %></h2>
+                    <div class="cart-title"><%= item.name %></div>
+                    <div class="cart-price"><%= item.price %></div>
+                    <div class="quantity-controls">
+                        <span class="decrease"><button class="decrease_btn">-</button></span>
+                        <span class="quantity">1</span>
+                        <span class="increase"><button class="increase_btn">+</button></span>
+                    </div>
+                </div> 
+
+            </div>
+        <% }) %>
+
+    </div>
+</body>
+<script>
+    let increaseBtn = document.getElementsByClassName('.increase_btn');
+    increaseBtn.addEventListener("click",(event)=>{
+        let card = event.target.closest('.card');
+        let quantity = document.getElementsByClassName('.quantity').innerText;
+        quantity.innerText = quantity++;
+    });
+
+    let decreaseBtn = document.getElementsByClassName('.decrease_btn');
+    decreaseBtn.addEventListener("click",(event)=>{
+        let card = event.target.closest('.card');
+        let quantity = document.getElementsByClassName('.quantity').innerText;
+
+        if(quantity >=1 ){
+            quantity.innerText = quantity--;
+        }else{
+            card.remove();
+        }
+    });
+</script>
+</html>

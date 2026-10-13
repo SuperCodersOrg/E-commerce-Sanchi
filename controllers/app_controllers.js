@@ -3,6 +3,7 @@ const router = express.Router();
 const cookie_parser = require('cookie-parser');
 require('dotenv').config();
 const Product = require('../models/products.js');
+const cartProducts = require('../models/cart.js');
 
 router.use(express.json());
 router.use(express.urlencoded({ extended : true }));
@@ -74,7 +75,7 @@ router.get('/women',authenticated,async (req,res)=>{
         const product = await Product.find({ category : 'Women' });
         res.render('category',{ products : product });
     }catch(error){
-        returnres.status(500).send(error);
+        return res.status(500).send(error);
     }
 });
 
@@ -83,7 +84,7 @@ router.get('/unisex',authenticated,async (req,res)=>{
         const product = await Product.find({ category : 'Unisex' });
         res.render('category',{ products : product });
     }catch(error){
-        returnres.status(500).send(error);
+        return res.status(500).send(error);
     }
 });
 
@@ -92,9 +93,35 @@ router.get('/footwear',authenticated,async (req,res)=>{
         const product = await Product.find({ category : 'Shoes' });
         res.render('category',{ products : product });
     }catch(error){
-        returnres.status(500).send(error);
+        return res.status(500).send(error);
     }
 });
 
+router.post('/add-to-cart',authenticated,async (req,res)=>{
+    const cardId = req.body._id;
+    
+    try{
+        const card = await Product.findOne({ _id : cardId });
+        cartProducts.create({
+            userId : card._id,
+            image : card.image,
+            name : card.name,
+            description : card.description,
+            price : card.price,
+            category : card.category,
+            quantity : 1
+        })
+        res.send('Success');
+    }
+    catch(error){
+        return res.status(500).send(error);
+    }
+
+});
+
+router.get('/cart-page',authenticated,async (req,res)=>{
+    const cart_prods = await cartProducts.find();
+    res.render('cart',{ products : cart_prods });
+});
 
 module.exports = router;

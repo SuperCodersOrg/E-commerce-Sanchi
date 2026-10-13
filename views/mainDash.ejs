@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/style.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <header>
@@ -21,10 +22,23 @@
             <div class="product-card" data-id="<%= product._id %>">
                 <img src="<%= product.image %>" alt="<% product.description %>"/>
                 <h2><%= product.name %></h2>
-                <a href="/prod/<%= product._id %>"><button>View details</button></a>
+                <button class="dash_cart" type="button">Add To Cart</button>
+                <a href="/prod/<%= product._id %>"><button class="view">View details</button></a>
             </div>
         <% }) %> 
     </div>
-    <button id="load_btn" type="button">Load more products...</button>
 </body>
+<script>
+    let productList = document.getElementById("products");
+    productList.addEventListener("click",(event)=>{
+        if(event.target.closest('.dash_cart')){
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Signup to add in your cart",
+                footer: "Already have an account? <a href='/login'>Login</a>"
+            });
+        }
+    })
+</script>
 </html>

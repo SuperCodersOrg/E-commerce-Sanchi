@@ -8,7 +8,7 @@
 </head>
 <body>
     <% if(product) { %>
-        <main id="product_details">
+        <main class="product_details">
             <div id="product_details_left">
                 <img src="<%= product.image %>" alt="<%= product.description %>"/>
                 <h2><%= product.name %></h3>
@@ -24,10 +24,26 @@
                         <span class="size"><%= size %></span>
                     <% }) %>
                 </div>
-                <button id="add_to_cart">ADD TO CART</button>
+                <button class="add_to_cart" data-id="<%= product._id %>">Add To Cart</button>
                 <div id="brand">Brand: <%= product.brand %></div>   
             </div>
         </main>
     <% } %>
 </body>
+<script>
+    let cartButton = document.querySelector('.add_to_cart');
+    cartButton.addEventListener("click",(event)=>{
+        let cardId = event.target.dataset.id;
+        console.log(cardId);
+        fetch('/add-to-cart',{
+            method : 'POST',
+            headers : {
+                'Content-Type' : 'application/json'
+            },
+            body : JSON.stringify({ _id : cardId })
+        });
+        let particular_cart = event.target.closest('.add_to_cart');
+        particular_cart.disabled = true;
+    });
+</script>
 </html>
