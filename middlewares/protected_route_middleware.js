@@ -17,6 +17,7 @@ const authenticated = ((req,res,next)=>{
         const verified = jwt.verify(token,process.env.JWT_SECRET);
         if(verified){
             req.user = verified;
+            res.locals.name = verified.name;
             next();
         }
     }

@@ -8,6 +8,7 @@ const mongoDB = require('./config/database');
 app.use(express.static(path.join(__dirname, 'public')));
 const { router : authRoutes } = require('./routes/authRoutes.js');
 const  appRoutes  = require('./routes/appRoutes.js');
+const Product = require('./models/products.js');
 
 mongoDB();
 
@@ -18,8 +19,17 @@ app.use(authRoutes);
 app.use(appRoutes);
 app.use(cors());
 
-app.get('/',(req,res)=>{
-    res.render('index');
+app.get('/',async (req,res)=>{
+    try{
+        const Products = await Product.find()
+                    .sort({ _id : 1 });
+        res.render('mainDash' ,  { 
+            Products
+        });
+    }catch(error){
+        console.log(error);
+        res.send(500).send('Unable to fetch products');
+    } 
 });
 
 app.listen(process.env.PORT,()=>{

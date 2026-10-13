@@ -13,7 +13,7 @@ router.use(express.urlencoded({ extended : true }));
 router.use(cookie_parser());
 
 router.get('/login',(req,res)=>{
-    res.render("login");
+   return res.render("login");
 })
 
 router.get('/signin',(req,res)=>{
@@ -63,7 +63,7 @@ router.post('/login', async (req,res)=>{
         httpOnly : true
     });
 
-    res.redirect(`/dashboard/${encodeURIComponent(existingUser.name)}`);
+    res.redirect(`/dashboard`);
 });
 
 router.post('/signin',async (req,res)=>{

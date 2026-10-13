@@ -7,18 +7,8 @@
     <link rel="stylesheet" href="/style.css"/>
 </head>
 <body>
-    <header>
-        <div>
-            <h3 id="website_name">VELNORA</h3>
-            <span id="user_img"><img src="/logo.png"/></span>
-            <div id="user_name">
-                <% if(name) { %>
-                    <span><%= name %></span>
-                <% } %>
-            </div>
-        </div>
-        <%- include('./partials/header') %>
-    </header>
+    <%- include('./partials/nameHeader') %>
+    <%- include('./partials/header') %>
     <div id="products">
         <%  Products.forEach((product,index) => { %>
             <div class="product-card" data-id="<%= product._id %>">

@@ -10,15 +10,15 @@ router.use(cookie_parser());
 
 const authenticated = require('../middlewares/protected_route_middleware');
 
-router.get('/dashboard/:name', authenticated, async (req,res)=>{
+router.get('/dashboard', authenticated, async (req,res)=>{
     try{
-        const Products = await Product.find()
+        const products = await Product.find()
                     .sort({ _id : 1 })
                     .limit(4);
 
         res.render('dashboard' ,  { 
-            name : req.params.name,
-            Products
+            
+            Products : products
         });
     }catch(error){
         console.log(error);
@@ -26,7 +26,7 @@ router.get('/dashboard/:name', authenticated, async (req,res)=>{
     } 
 });
 
-router.post('/fetch',async (req,res)=>{
+router.post('/fetch',authenticated,async (req,res)=>{
     try{
         const products = await Product.find({ _id : { $gt : req.body._id } })
                     .sort({ _id : 1 })
@@ -41,7 +41,7 @@ router.post('/fetch',async (req,res)=>{
     }
 });
 
-router.get('/prod/:id',async (req,res)=>{
+router.get('/prod/:id',authenticated,async (req,res)=>{
     try{
         const ids = req.params.id;
         const product = await Product.findOne({ _id : ids });
@@ -51,7 +51,7 @@ router.get('/prod/:id',async (req,res)=>{
     }   
 });
 
-router.get('/all',async (req,res)=>{
+router.get('/all',authenticated,async (req,res)=>{
     try{
         const product = await Product.find();
         res.render('category',{ products : product });
@@ -60,7 +60,7 @@ router.get('/all',async (req,res)=>{
     }
 });
 
-router.get('/men',async (req,res)=>{
+router.get('/men',authenticated,async (req,res)=>{
     try{
         const product = await Product.find({ category : 'Men' });
         res.render('category',{ products : product });
@@ -69,7 +69,7 @@ router.get('/men',async (req,res)=>{
     }
 });
 
-router.get('/women',async (req,res)=>{
+router.get('/women',authenticated,async (req,res)=>{
     try{
         const product = await Product.find({ category : 'Women' });
         res.render('category',{ products : product });
@@ -78,7 +78,7 @@ router.get('/women',async (req,res)=>{
     }
 });
 
-router.get('/unisex',async (req,res)=>{
+router.get('/unisex',authenticated,async (req,res)=>{
     try{
         const product = await Product.find({ category : 'Unisex' });
         res.render('category',{ products : product });
@@ -87,7 +87,7 @@ router.get('/unisex',async (req,res)=>{
     }
 });
 
-router.get('/footwear',async (req,res)=>{
+router.get('/footwear',authenticated,async (req,res)=>{
     try{
         const product = await Product.find({ category : 'Shoes' });
         res.render('category',{ products : product });
