@@ -4,6 +4,7 @@ const cookie_parser = require('cookie-parser');
 require('dotenv').config();
 const Product = require('../models/products.js');
 const cartProducts = require('../models/cart.js');
+const order = require('../models/order.js');
 
 router.use(express.json());
 router.use(express.urlencoded({ extended : true }));
@@ -133,7 +134,7 @@ router.get('/cart-page',authenticated,async (req,res)=>{
     }
 });
 
-router.post('/removeCart',async (req,res)=>{
+router.post('/removeCart',authenticated,async (req,res)=>{
     let id = req.body.userId;
     try{
         const result = await cartProducts.deleteOne({ userId : id });
@@ -143,7 +144,7 @@ router.post('/removeCart',async (req,res)=>{
     }
 });
 
-router.post('/add-quantity',async (req,res)=>{
+router.post('/add-quantity',authenticated,async (req,res)=>{
     const id = req.body.userId;
     try{
         const result = await cartProducts.findOneAndUpdate(
@@ -157,7 +158,7 @@ router.post('/add-quantity',async (req,res)=>{
     }
 });
 
-router.post('/dec-quantity',async (req,res)=>{
+router.post('/dec-quantity',authenticated,async (req,res)=>{
     const id = req.body.userId;
     try{
         const result = await cartProducts.findOneAndUpdate(
@@ -173,6 +174,91 @@ router.post('/dec-quantity',async (req,res)=>{
         }
     }catch(error){
         res.status(500).send('Unable to update quantity');
+    }
+});
+
+router.get('/address-page',authenticated,async(req,res)=>{
+    try{
+        res.render('placeOrder');
+    }catch(error){
+        res.status(500).send('Page not found');
+    }
+});
+
+router.post('/bill',authenticated,async(req,res)=>{
+    try{
+        const cartFull = await cartProducts.find();
+        console.log(cartFull);
+        const shippingAddress = {
+            fullName : req.body.order_name,
+            phone : req.body.order_phone,
+            address : req.body.address,
+            pincode : req.body.pincode,
+            city : req.body.city,
+            state : req.body.state,
+        }
+        res.render("orders",{ cart : cartFull , shippingAddress });
+    }catch(error){
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+router.post('/place-order',authenticated,async (req,res)=>{
+    try {
+        const { fullName , phone , address , city , pincode , state } = req.body;
+
+        const cartProduct = await cartProducts.find();
+        const cart = cartProduct.map((item)=>({
+            productId : item.userId,
+            quantity : item.quantity,
+            price : item.price
+        }));
+
+        const subtotal = cart.reduce((sum,item)=>{return sum + item.quantity * item.price},0);
+
+        const handling = 200;
+        const delivery = subtotal >= 1000 ? 0 : 50;
+        const gst = 0.05*subtotal;
+        const total = handling + delivery + gst + subtotal;
+
+        console.log("JWT user:", req.user);
+        console.log("User ID:", req.user._id);
+        
+        await order.create({
+            userId : req.user._id,
+            cart,
+            total,
+            shippingAddress : {
+                fullName,
+                phone,
+                address,
+                city,
+                pincode,
+                state
+            },
+            paymentMethod : 'COD',
+            paymentStatus : 'pending',
+            orderStatus : 'confirmed'
+        });
+
+        await cartProducts.deleteMany({});
+
+        res.status(200).send('Order Confirmed');
+
+    }catch(error){
+        console.log("Place order error",error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+router.get('/order-history',authenticated,async(req,res)=>{
+    try{
+        const orders = await order.find({
+            userId : req.user._id
+        });
+        res.render("history",{orders});
+    }catch(error){
+        res.status(500).send('Internal server error');
     }
 });
 

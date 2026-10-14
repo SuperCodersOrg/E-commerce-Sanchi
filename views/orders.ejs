@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+    <h1 id="summary">Order Summary</h1>
+    <div class="orderBox">
+        <% cart.forEach((item) => { %>
+            <div class="order-item">
+                <img src="<%= item.image %>" alt="<%= item.name %>">
+                <div class="order-details">
+                    <div class="nameInCart"><%= item.name %></div>
+                    <div class="priceInCart">$<%= item.price %></div>
+                    <div class="quantityInCart">Quantity: <%= item.quantity %></div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+    <div id="amount">Amount to be paid</div>
+    <div id="total">
+        <div>
+            <span id="subtotal">Sub Total: </span>
+            <span id="subtotal_price"></span>
+        </div>
+        <div>
+            <span id="tax">GST: </span>
+            <span id="tax_price"></span>
+        </div>
+        <div>
+            <span id="handling">Handling Fee: </span>
+            <span id="handling_price"></span>
+        </div>
+        <div>
+            <span id="delivery">Delivery: </span>
+            <span id="delivery_price"></span>
+        </div>
+        <div>
+            <span id="grandtotal">Grand Total: </span>
+            <span id="grandtotal_price"></span>
+        </div>
+    </div>
+    <form id="codForm" action="/place-order" method="POST">
+        <input type="hidden" name="fullName" value="<%= shippingAddress.fullName %>">
+        <input type="hidden" name="phone" value="<%= shippingAddress.phone %>">
+        <input type="hidden" name="address" value="<%= shippingAddress.address %>">
+        <input type="hidden" name="pincode" value="<%= shippingAddress.pincode %>">
+        <input type="hidden" name="city" value="<%= shippingAddress.city %>">
+        <input type="hidden" name="state" value="<%= shippingAddress.state %>">
+    </form>
+    <div id="payment-section">
+        <button type="button" id="paybtn">Pay Now</button>
+        <div id="paymentOpns">
+            <button type="submit" form="codForm" id="cod" hidden>
+                COD
+            </button>
+            <a href="place-order-online"><button type="button" id="razorpay" hidden>
+                Pay Online
+            </button></a>
+        </div>
+    </div>
+</body>
+<script>
+    let subtotal = 0;
+    let subTotalDiv = document.getElementById("subtotal_price");
+    let taxDiv = document.getElementById("tax_price");
+    let handlingDiv = document.getElementById("handling_price");
+    let deliveryDiv = document.getElementById("delivery_price");
+    let grandTotalDiv = document.getElementById("grandtotal_price");
+
+    let quantityInCarts = document.querySelectorAll(".quantityInCart");
+    let priceInCarts = document.querySelectorAll(".priceInCart");
+
+    for(let i=0 ; i<quantityInCarts.length ; i++){
+        let quantity = Number(quantityInCarts[i].innerText.split(': ')[1]);
+        console.log(quantity);
+        let price = Number(priceInCarts[i].innerText.replace('$',''));
+        console.log(price);
+        subtotal = subtotal + (quantity * price );
+    }
+
+    let subtotal_ = subtotal;
+    let delivery = subtotal >= 1000 ? 0 : 50;
+    let handling = 200;
+    let tax = (0.05 * subtotal);
+    subTotalDiv.innerText = "$"+subtotal.toFixed(2);
+    deliveryDiv.innerText = "$"+delivery.toFixed(2);
+    handlingDiv.innerText = "$"+handling.toFixed(2);
+    taxDiv.innerText = "$"+tax.toFixed(2);
+    grandTotalDiv.innerText = "$"+((subtotal_ + delivery + handling + tax)).toFixed(2);
+
+    let paySection=document.getElementById("payment-section")
+    let cod = document.getElementById("cod");
+    let payBtn = document.getElementById("paybtn");
+    let paymentOpns = document.getElementById("paymentOpns");
+    let razorpay = document.getElementById("razorpay");
+
+    paySection.addEventListener("click",(event)=>{
+        if(event.target.closest('#paybtn')){
+            paymentOpns.hidden = false;
+            razorpay.hidden = false;
+            cod.hidden = false;
+        }
+
+        if(event.target.closest("#razorpay")){
+            
+        }
+    })
+
+</script>
+</html>

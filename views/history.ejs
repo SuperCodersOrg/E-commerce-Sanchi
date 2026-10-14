@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+    <% if(orders.length === 0) { %>
+        <h2>You haven't placed any order yet..</h2>
+        <a href="/all">Continue Shopping</a>
+    <% } %>
+    <% orders.forEach((item)=>{ %>
+        <div class="history-order">
+            <h3>Order Id : <%= item._id %></h3>
+            <p>Placed On: <%= new Date(item._id.getTimestamp()).toLocaleTimeString() %></p>
+            <div>Payment Status: <%= item.paymentStatus %></div>
+            <div>Payment Method: <%= item.paymentMethod %></div>
+            <div>OrderStatus: <%= item.orderStatus %></div>
+            <% item.items.forEach((order)=>{ %>
+                <div>Product id: <%= order._id %></div>
+                <div>Quantity: <%= order.quantity %></div>
+                <div>Price: <%= order.price %></div>
+            <% }) %>
+            <h3>Total Amount: <%= item.totalAmount %></h3>
+            <h4>Delivery Address:</h4>
+            <p><%= item.shippingAddress.fullName %></p>
+            <p><%= item.shippingAddress.phone %></p>
+            <p><%= item.shippingAddress.address %></p>
+            <p><%= item.shippingAddress.state %></p>
+            <p><%= item.shippingAddress.pincode %></p>
+        </div>
+        <hr>
+    <% }) %>
+</body>
+</html>

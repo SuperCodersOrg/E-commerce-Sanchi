@@ -54,7 +54,7 @@ router.post('/login', async (req,res)=>{
     }
 
     const ACCESS_TOKEN = jwt.sign(
-        { name : existingUser.name , email : existingUser.email },
+        { name : existingUser.name , email : existingUser.email , _id : existingUser._id },
         process.env.JWT_SECRET,
         { expiresIn : '2h' }
     );
@@ -74,11 +74,6 @@ router.post('/signin',async (req,res)=>{
     }
 
     const existingUser = await User.findOne({ email });
-
-    console.log('Signup email:', email);
-    console.log('Database:', User.db.name);
-    console.log('Collection:', User.collection.name);
-    console.log('Found user:', existingUser?._id);
 
     if(existingUser){
         return res.send(`User already exists`);
@@ -167,7 +162,7 @@ router.post('/forget-password',async (req,res)=>{
 
     const nodemailerTransporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 587,
+        port: 2525,
         secure: true,
         auth : {
             user : process.env.SENDER_EMAIL,
@@ -232,6 +227,11 @@ router.post('/reset-password/:token',async (req,res)=>{
         return res.send('Invalid or expired reset link');
     }
 
+});
+
+router.get('/logout', (req, res) => {
+    res.clearCookie('Access_Token');
+    res.redirect('/login');
 });
 
 module.exports = router;
