@@ -102,7 +102,11 @@ router.post('/add-to-cart',authenticated,async (req,res)=>{
     
     try{
         const card = await Product.findOne({ _id : cardId });
-        cartProducts.create({
+        const alreadyInCart = await cartProducts.exists({
+            userId : cardId
+        });
+        if(!alreadyInCart){
+            await cartProducts.create({
             userId : card._id,
             image : card.image,
             name : card.name,
@@ -111,7 +115,8 @@ router.post('/add-to-cart',authenticated,async (req,res)=>{
             category : card.category,
             quantity : 1
         })
-        res.send('Success');
+        res.status(200).send('Success');
+        }
     }
     catch(error){
         return res.status(500).send(error);
@@ -120,8 +125,55 @@ router.post('/add-to-cart',authenticated,async (req,res)=>{
 });
 
 router.get('/cart-page',authenticated,async (req,res)=>{
-    const cart_prods = await cartProducts.find();
-    res.render('cart',{ products : cart_prods });
+    try{
+        const cart_prods = await cartProducts.find();
+        res.render('cart',{ products : cart_prods });
+    }catch(error){
+        res.status(500).send(error);
+    }
+});
+
+router.post('/removeCart',async (req,res)=>{
+    let id = req.body.userId;
+    try{
+        const result = await cartProducts.deleteOne({ userId : id });
+        res.status(200).send('Deleted successfully');
+    }catch(error){
+        res.status(404).send('Unable to remove');
+    }
+});
+
+router.post('/add-quantity',async (req,res)=>{
+    const id = req.body.userId;
+    try{
+        const result = await cartProducts.findOneAndUpdate(
+            { userId : id },
+            { $inc : { quantity : 1 } },
+            { new : true }
+        );
+        res.status(200).json({ quantity : result.quantity });
+    }catch(error){
+        res.status(500).send('Unable to update quantity');
+    }
+});
+
+router.post('/dec-quantity',async (req,res)=>{
+    const id = req.body.userId;
+    try{
+        const result = await cartProducts.findOneAndUpdate(
+            { userId : id },
+            { $inc : { quantity : -1 } },
+            { new : true }
+        );
+        if(result.quantity <= 0){
+            await cartProducts.deleteOne({ userId : id });
+            res.status(200).json({quantity : 0});
+        }else{
+            res.status(200).json({quantity : result.quantity});
+        }
+    }catch(error){
+        res.status(500).send('Unable to update quantity');
+    }
 });
 
 module.exports = router;

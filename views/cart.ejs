@@ -8,10 +8,10 @@
 </head>
 <body>
     <%- include('./partials/nameHeader') %>
-    <div id="head-cart">
+    <!-- <div id="head-cart">
         <div>VELNORA</div>
         <div>SHOPPING BAG</div>
-    </div>
+    </div> -->
 
     <div id="mid-cart">
         <h2>Your shopping bag</h2>
@@ -21,7 +21,7 @@
     <div id="cartProducts">
 
         <% products.forEach((item)=>{ %>
-            <div class="card">
+            <div class="card" data-id="<%= item.userId %>">
 
                 <div class="card-left">
                     <img src="<%= item.image %>" alt="<%= item.description %>"/>
@@ -33,8 +33,9 @@
                     <div class="cart-price"><%= item.price %></div>
                     <div class="quantity-controls">
                         <span class="decrease"><button class="decrease_btn">-</button></span>
-                        <span class="quantity">1</span>
+                        <span class="quantity"><%= item.quantity %></span>
                         <span class="increase"><button class="increase_btn">+</button></span>
+                        <span class="removebtn">Remove</span>
                     </div>
                 </div> 
 
@@ -44,23 +45,78 @@
     </div>
 </body>
 <script>
-    let increaseBtn = document.getElementsByClassName('.increase_btn');
-    increaseBtn.addEventListener("click",(event)=>{
-        let card = event.target.closest('.card');
-        let quantity = document.getElementsByClassName('.quantity').innerText;
-        quantity.innerText = quantity++;
-    });
+    let cartItems = document.getElementById("cartProducts");
+    cartItems.addEventListener("click",async (event)=>{
+        event.stopPropagation();
+        event.preventDefault();
 
-    let decreaseBtn = document.getElementsByClassName('.decrease_btn');
-    decreaseBtn.addEventListener("click",(event)=>{
-        let card = event.target.closest('.card');
-        let quantity = document.getElementsByClassName('.quantity').innerText;
+        if(event.target.closest('.removebtn')){
+            let cartid = event.target.closest('.card').dataset.id;
+            let product = event.target.closest('.card');
 
-        if(quantity >=1 ){
-            quantity.innerText = quantity--;
-        }else{
-            card.remove();
+            const res = await fetch('/removeCart',{
+                method : 'POST',
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                body : JSON.stringify({ userId : cartid })
+            })
+
+            if(res.ok){
+                product.remove();
+            }else{
+                alert('Unable to remove item');
+            }
         }
-    });
+
+        if(event.target.closest('.increase_btn')){
+            let cartid = event.target.closest('.card').dataset.id;
+            let card = event.target.closest('.card');
+
+            const res = await fetch('/add-quantity',{
+                method : 'POST',
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                body : JSON.stringify({ userId : cartid })
+            });
+
+            if(res.ok){    
+                const data = await res.json();
+                card.querySelector('.quantity').textContent = data.quantity;
+            }else{
+                alert('Unable to add quantity');
+            }
+
+        }
+
+        if(event.target.closest('.decrease_btn')){
+            let cartid = event.target.closest('.card').dataset.id;
+            let card = event.target.closest('.card');
+
+            const res = await fetch('/dec-quantity',{
+                method : 'POST',
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                body : JSON.stringify({ userId : cartid })
+            });
+
+            if(res.ok){
+                const data = await res.json();
+                if(data.quantity === 0){
+                    card.remove();
+                    return;
+                }else{
+                    card.querySelector('.quantity').textContent = data.quantity;
+                }
+            }else{
+                alert('Unable to add quantity');
+            }
+
+        }
+
+    })
+
 </script>
 </html>
