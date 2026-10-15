@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const cookie_parser = require('cookie-parser');
 require('dotenv').config();
+const crypto = require('crypto');
+const Razorpay = require('razorpay');
 const Product = require('../models/products.js');
 const cartProducts = require('../models/cart.js');
 const order = require('../models/order.js');
@@ -9,6 +11,11 @@ const order = require('../models/order.js');
 router.use(express.json());
 router.use(express.urlencoded({ extended : true }));
 router.use(cookie_parser());
+
+const razorpay = new Razorpay({
+    key_id : process.env.RAZORPAY_KEY_ID,
+    key_secret : process.env.RAZORPAY_KEY_SECRET
+})
 
 const authenticated = require('../middlewares/protected_route_middleware');
 
@@ -208,13 +215,13 @@ router.post('/place-order',authenticated,async (req,res)=>{
         const { fullName , phone , address , city , pincode , state } = req.body;
 
         const cartProduct = await cartProducts.find();
-        const cart = cartProduct.map((item)=>({
+        const items = cartProduct.map((item)=>({
             productId : item.userId,
             quantity : item.quantity,
             price : item.price
         }));
 
-        const subtotal = cart.reduce((sum,item)=>{return sum + item.quantity * item.price},0);
+        const subtotal = items.reduce((sum,item)=>{return sum + item.quantity * item.price},0);
 
         const handling = 200;
         const delivery = subtotal >= 1000 ? 0 : 50;
@@ -226,8 +233,8 @@ router.post('/place-order',authenticated,async (req,res)=>{
         
         await order.create({
             userId : req.user._id,
-            cart,
-            total,
+            items : items,
+            totalAmount : total,
             shippingAddress : {
                 fullName,
                 phone,
@@ -248,6 +255,112 @@ router.post('/place-order',authenticated,async (req,res)=>{
     }catch(error){
         console.log("Place order error",error);
         res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post('/create-razorpay-order',authenticated,async(req,res)=>{
+    try {
+        const { fullName , phone , address , city , pincode , state } = req.body.shippingAddress;
+
+        const cartProduct = await cartProducts.find();
+
+        const items = cartProduct.map((item)=>({
+            productId : item.userId,
+            quantity : item.quantity,
+            price : item.price
+        }));
+
+        const subtotal = items.reduce((sum,item)=>{return sum + item.quantity * item.price},0);
+
+        const handling = 200;
+        const delivery = subtotal >= 1000 ? 0 : 50;
+        const gst = 0.05*subtotal;
+        const total = handling + delivery + gst + subtotal;
+
+        const razorpayOrder = await razorpay.orders.create({
+            amount : Math.round(total * 100),
+            currency : 'INR',
+            receipt : `receipt_${Date.now()}`
+        });
+
+        await order.create({
+            userId : req.user._id,
+            items : items,
+            totalAmount : total,
+            shippingAddress : {
+                fullName,
+                phone,
+                address,
+                city,
+                pincode,
+                state
+            },
+            paymentMethod : 'RAZORPAY',
+            razorpayOrderId : razorpayOrder.id,
+            paymentStatus : 'pending',
+            orderStatus : 'pending'
+        });
+
+        res.status(200).json({
+            orderId : razorpayOrder.id,
+            amount : razorpayOrder.amount,
+            currency : razorpayOrder.currency,
+            key : process.env.RAZORPAY_KEY_ID
+        });
+
+    }catch(error){
+        console.log('Razorpay order error:',error);
+        res.status(500).json({
+            message : 'Unable to create payment order'
+        });
+    }
+});
+
+router.post('/verify-razorpay-payment', authenticated, async (req, res) => {
+    try {
+        const {
+            razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature
+        } = req.body;
+
+        const savedOrder = await order.findOne({
+            userId : req.user._id,
+            razorpayOrderId : razorpay_order_id
+        });
+
+        const generatedSignature = crypto
+            .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+            .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+            .digest('hex');
+
+        if (generatedSignature !== razorpay_signature) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid payment signature'
+            });
+        }
+
+        savedOrder.razorpayPaymentId = razorpay_payment_id;
+        savedOrder.paymentStatus = 'paid';
+        savedOrder.orderStatus = 'confirmed';
+
+        await savedOrder.save();
+
+        await cartProducts.deleteMany({});
+
+        return res.status(200).json({
+            success: true,
+            message: 'Payment verified successfully'
+        });
+
+    } catch (error) {
+        console.log('Payment verification error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Payment verification failed'
+        });
     }
 });
 

@@ -6,10 +6,13 @@
     <title>Document</title>
     <link rel="stylesheet" href="/style.css"/>
 </head>
-<body>
+<body class="history-page">
+    <h1>My Orders</h1>
     <% if(orders.length === 0) { %>
-        <h2>You haven't placed any order yet..</h2>
-        <a href="/all">Continue Shopping</a>
+        <div class="history-empty">
+            <h2>You haven't placed any order yet..</h2>
+            <a href="/all">Continue Shopping</a>
+        </div>
     <% } %>
     <% orders.forEach((item)=>{ %>
         <div class="history-order">
@@ -24,12 +27,19 @@
                 <div>Price: <%= order.price %></div>
             <% }) %>
             <h3>Total Amount: <%= item.totalAmount %></h3>
-            <h4>Delivery Address:</h4>
-            <p><%= item.shippingAddress.fullName %></p>
-            <p><%= item.shippingAddress.phone %></p>
-            <p><%= item.shippingAddress.address %></p>
-            <p><%= item.shippingAddress.state %></p>
-            <p><%= item.shippingAddress.pincode %></p>
+            <div class="history-address">
+                <span class="address-label">Delivery Address:</span>
+                <span><%= item.shippingAddress.fullName %></span>
+                <span class="address-separator">|</span>
+                <span>Phone: <%= item.shippingAddress.phone %></span>
+                <span class="address-separator">|</span>
+                <span>
+                    <%= item.shippingAddress.address %>,
+                    <%= item.shippingAddress.city %>,
+                    <%= item.shippingAddress.state %> -
+                    <%= item.shippingAddress.pincode %>
+                </span>
+            </div>
         </div>
         <hr>
     <% }) %>

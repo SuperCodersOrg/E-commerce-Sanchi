@@ -4,23 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <link rel="stylesheet" href="/style.css"/>
 </head>
-<body>
-    <h1 id="summary">Order Summary</h1>
-    <div class="orderBox">
+<body class="order-page">
+    <main class="order-summary-page">
+    <h1 id="order-summary">Order Summary</h1>
+    <div class="orderBox" class="order-box">
         <% cart.forEach((item) => { %>
             <div class="order-item">
-                <img src="<%= item.image %>" alt="<%= item.name %>">
+                <img class="order-item-image" src="<%= item.image %>" alt="<%= item.name %>">
                 <div class="order-details">
-                    <div class="nameInCart"><%= item.name %></div>
+                    <h3 class="nameInCart"><%= item.name %></h3>
                     <div class="priceInCart">$<%= item.price %></div>
                     <div class="quantityInCart">Quantity: <%= item.quantity %></div>
                 </div>
             </div>
         <% }) %>
     </div>
-    <div id="amount">Amount to be paid</div>
+    <section class="order-total-section">
+        <h2 style="text-align: center; margin-top: 20px;">Price Details</h2>
     <div id="total">
         <div>
             <span id="subtotal">Sub Total: </span>
@@ -57,9 +60,9 @@
             <button type="submit" form="codForm" id="cod" hidden>
                 COD
             </button>
-            <a href="place-order-online"><button type="button" id="razorpay" hidden>
+            <button type="button" id="razorpay" hidden>
                 Pay Online
-            </button></a>
+            </button>
         </div>
     </div>
 </body>
@@ -98,15 +101,74 @@
     let paymentOpns = document.getElementById("paymentOpns");
     let razorpay = document.getElementById("razorpay");
 
-    paySection.addEventListener("click",(event)=>{
+    paySection.addEventListener("click",async(event)=>{
         if(event.target.closest('#paybtn')){
             paymentOpns.hidden = false;
             razorpay.hidden = false;
             cod.hidden = false;
         }
 
+        const form = document.getElementById('codForm');
+
+        const shippingAddress = {
+            fullName: form.elements['fullName'].value,
+            phone: form.elements['phone'].value,
+            address: form.elements['address'].value,
+            pincode: form.elements['pincode'].value,
+            city: form.elements['city'].value,
+            state: form.elements['state'].value
+        };
+
         if(event.target.closest("#razorpay")){
-            
+            fetch('/create-razorpay-order',{
+                method : 'POST',
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                body : JSON.stringify({ shippingAddress })
+            }).then((response)=>{return response.json()})
+            .then((data)=>{
+                console.log(data);
+                console.log(data.key);
+                const options = {
+                    key : data.key,
+                    amount : data.amount,
+                    currency : data.currency,
+                    order_id : data.orderId,
+                    name : 'VELNORA',
+                    description : 'Order Payment',
+                    handler : async function (response) {
+                        try {
+                            const result = await fetch('/verify-razorpay-payment', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+
+                        const data = await result.json();
+                        console.log(data);
+
+                        if (result.ok) {
+                            alert('Payment verified successfully!');
+                        } else {
+                            alert(data.message || 'Payment verification failed');
+                        }
+                        }catch (error) {
+                            console.log('Verification error:', error);
+                        }
+                    } 
+                }
+                const paymentObject = new Razorpay(options);
+                paymentObject.open();
+            }).catch((error)=>{
+                console.log(error);
+            });
         }
     })
 

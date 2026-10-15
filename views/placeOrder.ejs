@@ -6,8 +6,10 @@
     <title>Document</title>
     <link rel="stylesheet" href="/style.css"/>
 </head>
-<body>
-    <form id="orderForm" method="POST" action="/bill">
+<body class="order-page">
+    <div class="place-order-container">
+        <h1>Shipping <Details></Details></h1>
+        <form class="place-order-form" id="orderForm" method="POST" action="/bill">
         <label for="order_name">Name</label>
         <input type="text" placeholder="Your name" name="order_name" id="order_name">
 
@@ -26,7 +28,8 @@
         <label for="state">State</label>
         <input type="text" name="state" id="state" placeholder="Your state">
 
-        <button type="submit" id="submitOrder">Generate Bill</button>
+        <button type="submit" class="order-primary-btn" id="submitOrder">Generate Bill</button>
     </form>
+    </div>
 </body>
 </html>
