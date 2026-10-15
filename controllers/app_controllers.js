@@ -7,6 +7,7 @@ const Razorpay = require('razorpay');
 const Product = require('../models/products.js');
 const cartProducts = require('../models/cart.js');
 const order = require('../models/order.js');
+const Users = require('../models/user.js');
 
 router.use(express.json());
 router.use(express.urlencoded({ extended : true }));
@@ -18,6 +19,7 @@ const razorpay = new Razorpay({
 })
 
 const authenticated = require('../middlewares/protected_route_middleware');
+
 
 router.get('/dashboard', authenticated, async (req,res)=>{
     try{
@@ -372,6 +374,160 @@ router.get('/order-history',authenticated,async(req,res)=>{
         res.render("history",{orders});
     }catch(error){
         res.status(500).send('Internal server error');
+    }
+});
+
+router.get('/admin-dashboard',async (req,res)=>{
+    
+    try{
+
+        res.render('adminDashboard', { page: 'overview' });
+
+    }catch(error){
+
+        console.log(error.message);
+        return res.status(500).send('Server Error');
+
+    }
+});
+
+router.get('/buyers-details',async (req,res)=>{
+    try{
+
+        const buyerLists = await Users.find({ isBuyer : true })
+                                        .select('name email');
+
+        
+        return res.render('adminDashboard' , {  page : 'buyers' , buyerLists });
+
+    }catch(error){
+
+        console.log(error.message);
+        return res.status(500).send('Server Error');
+
+    }
+});
+
+router.get('/orders-review',async (req,res)=>{
+    try{
+
+        const ordersLists = await order.find();
+        
+        return res.render('adminDashboard' , {  page : 'orders' , ordersLists });
+
+    }catch(error){
+
+        console.log(error.message);
+        return res.status(500).send('Server Error');
+
+    }
+});
+
+router.get('/admin-profile',async (req,res)=>{
+    try{
+
+        const admin = await Users.find({ isAdmin : true });
+        
+        return res.render('adminDashboard' , {  page : 'profile' , admin });
+
+    }catch(error){
+
+        console.log(error.message);
+        return res.status(500).send('Server Error');
+
+    }
+});
+
+router.get('/analytics',async (req,res)=>{
+    try{
+        const totalOrders = await order.countDocuments({});
+        console.log(totalOrders);
+
+        const totalBuyers = await Users.aggregate([
+            {
+                $match : {
+                    isBuyer : true
+                }
+            },
+            {
+                $count : "count"
+            }
+        ]);
+        console.log(totalBuyers);
+        const count = totalBuyers.length !== 0 ? totalBuyers[0].count : 0;
+        console.log(count);
+
+        // const products  = await order.find({ paymentStatus : 'paid' });
+        // console.log(products);
+        const totalProducts = await order.aggregate([
+            {
+                $match : {
+                    paymentStatus : 'paid'
+                }
+            },
+            {
+                $unwind : "$items"
+            },
+            {
+                $group : {
+                    _id : null,
+                    total : {
+                        $sum : "$items.quantity"
+                    }
+                }
+            }
+        ]);
+        // console.log(totalProducts);
+        const total = totalProducts.length !== 0 ?  totalProducts[0].total : 0;
+        console.log(total);
+
+        const totalRevenue = await order.aggregate([
+            {
+                $match : {
+                    paymentStatus : 'paid'
+                }
+            },
+            {
+                $group : {
+                    _id : null,
+                    amount : {
+                        $sum : "$totalAmount"
+                    }
+                }
+            }
+        ]);
+        const amount = totalRevenue.length !== 0 ? totalRevenue[0].amount : 0;
+        console.log(amount);
+
+        const topSellingProducts = await order.aggregate([
+            {
+                $unwind : "$items"
+            },
+            {
+                $group : {
+                    _id : "$items.productId",
+                    totalQuantitySold : {
+                        $sum : "$items.quantity"
+                    }
+                }
+            },
+            {
+                $sort : {
+                    totalQuantitySold : -1
+                }
+            },
+            {
+                $limit : 3
+            }
+        ]);
+
+        console.log(topSellingProducts);
+
+        res.render('adminDashboard' , { page : 'stats' , amount , totalOrders , count , total , topSellingProducts })
+
+    }catch(error){
+        console.log(error.message);
+        res.status(500).send('Server Error');
     }
 });
 

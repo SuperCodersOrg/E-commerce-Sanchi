@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+
+    <div id="admin-page">
+
+        <header id="admin-header">
+            <div id="brand-name">VELNORA</div>
+            <div id="admin-label">ADMIN</div>
+        </header>
+
+        <hr class="divider">
+
+        <button id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false"> ☰ </button>
+
+        <aside id="sidebar">
+            <nav id="sidebar-options">
+                <a href="/buyers-details">👥 Buyers</a>
+                <hr>
+
+                <a href="/analytics">📈 Analytics</a>
+                <hr>
+
+                <a href="/orders-review">🛒 Orders</a>
+                <hr>
+
+                <a href="/products-show">👜 Products</a>
+                <hr>
+
+                <a href="/admin-profile">👤 Profile</a>
+            </nav>
+        </aside>
+
+        <main id="admin-content">
+            <% if(page === "buyers") { %>
+                <h1>Buyers Details</h1>
+
+                <% buyerLists.forEach((item)=>{ %>
+
+                    <div id="buyer-box">
+                        <div id="identity">BUYER</div>
+                        <div id="buyer-name"><%= item.name %></div>
+                        <div id="buyer-email"><%= item.email %></div>
+                    </div>
+
+                <% }) %>
+
+            <% } %>
+
+
+            <% if(page === "orders") { %>
+                <h1>Orders Review</h1>
+
+                <% ordersLists.forEach((item)=>{ %>
+
+                    <div id="order-box">
+
+                        <div id="order-quantity">
+                            <% item.items.forEach((object)=>{ %>
+
+                                <div class="order-product">
+                                    <img src="<%= object.image %>" alt="<%= object.description %>">
+                                    
+                                    <div id="product-details">
+                                        <div id="product-details-name"><%= object.name %></div>
+                                        <div id="product-details-quantity">Qty: <%= object.quantity %></div>
+                                    </div>
+
+                                </div>
+
+                            <% }) %>
+                        </div>
+
+                        <div id="order-totalAmount">Total Amount: <%= item.totalAmount %></div>
+                        <div id="order-paymentMethod">Payment Method: <%= item.paymentMethod %></div>
+                        <div id="order-paymentStatus">Payment Status: <%= item.paymentStatus %></div>
+                        <div id="order-status">Order Status: <%= item.orderStatus %></div>
+                    </div>
+
+                <% }) %>
+
+            <% } %>
+
+
+            <% if(page === 'profile') { %>
+
+                <div id="admin-box">
+
+                    <div id="admins_details">  
+                        <img src="./adminlogo.png" alt="admin-image">  
+                        <div id="admins_name">VELNORA Admin</div>
+                        <div>Store Administrator</div>
+                        <div>ADMIN ACCOUNT</div>
+                    </div>
+
+                    <div id="settings">
+                        <div id="account-settings">Account Settings</div>
+                        <a href="/forget-password">🗝️ Change Password</a>
+                        <a href="/logout">🚪 Logout</a>
+                    </div>
+                </div>
+
+            <% } %>
+
+
+            <% if(page === 'stats') { %>
+                <h1>Store Analytics</h1>
+                <p>Store performance overview</p>
+
+                <div id="stat-details">
+
+                    <div id="revenue">
+                        <div id="rev_sign">$</div>
+                        <div id="rev_head">Total Revenue</div>
+                        <div id="rev_amt">$ <%= amount %> </div>
+                    </div>
+
+                    <div id="stat-orders">
+                        <div id="stat_orders_sign">🛒</div>
+                        <div id="stat_orders_head">Total Orders</div>
+                        <div id="stat_orders_amt"><%= totalOrders %> </div>
+                    </div>
+
+                    <div id="stat-buyers">
+                        <div id="stat-buyers_sign">👤 </div>
+                        <div id="stat-buyers_head">Total Buyers</div>
+                        <div id="stat-buyers_amt"> <%= count %></div>
+                    </div>
+
+                    <div id="stat-products">
+                        <div id="stat-products_sign">👜</div>
+                        <div id="rstat-products_head">Products Sold</div>
+                        <div id="stat-products_amt"><%= total %></div>
+                    </div>
+
+                    <div id="top-div">
+                        <% topSellingProducts.forEach((item)=>{ %>
+
+                            <div id="top-products">
+
+                                <div id="top-products-name"><%= item.name %></div>
+                                <div id="top-products-qty">Units Sold: <%= item.totalQuantitySold %></div>
+
+                            </div>
+
+                        <% }) %>
+                    </div>
+        
+                </div>
+
+            <% } %>
+        </main>
+
+    </div>
+
+    <script>
+        const toggleButton = document.getElementById("sidebar-toggle");
+        const sidebar = document.getElementById("sidebar");
+
+        toggleButton.addEventListener("click", () => {
+            const isOpen = sidebar.classList.toggle("sidebar-open");
+
+            toggleButton.setAttribute("aria-expanded", isOpen);
+            toggleButton.textContent = isOpen ? "✕" : "☰";
+        });
+    </script>
+
+</body>
+</html>

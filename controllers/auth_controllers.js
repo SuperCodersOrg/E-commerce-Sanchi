@@ -40,6 +40,11 @@ router.post('/login', async (req,res)=>{
         return res.send('Please fill out all the details');
     }
 
+    const user = await User.findOne({ email , isAdmin : true });
+    if(user){
+        return res.redirect('/admin-dashboard',);
+    }
+
     const existingUser = await User.findOne({ email });
     if(!existingUser){
         return res.send(`Wrong details`);
