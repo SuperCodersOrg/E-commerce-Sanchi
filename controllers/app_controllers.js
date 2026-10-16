@@ -4,11 +4,13 @@ const cookie_parser = require('cookie-parser');
 require('dotenv').config();
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
+const multer = require('multer');
 const Product = require('../models/products.js');
 const cartProducts = require('../models/cart.js');
 const order = require('../models/order.js');
 const Users = require('../models/user.js');
 
+router.use(express.static('public'));
 router.use(express.json());
 router.use(express.urlencoded({ extended : true }));
 router.use(cookie_parser());
@@ -20,6 +22,13 @@ const razorpay = new Razorpay({
 
 const authenticated = require('../middlewares/protected_route_middleware');
 
+const storage = multer.diskStorage({
+    destination : function (req,file,cb){
+        cb(null,'uploads')
+    }
+});
+
+const upload = multer({ storage: storage });
 
 router.get('/dashboard', authenticated, async (req,res)=>{
     try{
@@ -377,7 +386,7 @@ router.get('/order-history',authenticated,async(req,res)=>{
     }
 });
 
-router.get('/admin-dashboard',async (req,res)=>{
+router.get('/admin-dashboard',authenticated,async (req,res)=>{
     
     try{
 
@@ -391,7 +400,7 @@ router.get('/admin-dashboard',async (req,res)=>{
     }
 });
 
-router.get('/buyers-details',async (req,res)=>{
+router.get('/buyers-details',authenticated,async (req,res)=>{
     try{
 
         const buyerLists = await Users.find({ isBuyer : true })
@@ -408,7 +417,7 @@ router.get('/buyers-details',async (req,res)=>{
     }
 });
 
-router.get('/orders-review',async (req,res)=>{
+router.get('/orders-review',authenticated,async (req,res)=>{
     try{
 
         const ordersLists = await order.find();
@@ -423,7 +432,7 @@ router.get('/orders-review',async (req,res)=>{
     }
 });
 
-router.get('/admin-profile',async (req,res)=>{
+router.get('/admin-profile',authenticated,async (req,res)=>{
     try{
 
         const admin = await Users.find({ isAdmin : true });
@@ -438,14 +447,44 @@ router.get('/admin-profile',async (req,res)=>{
     }
 });
 
-router.get('/analytics',async (req,res)=>{
+router.get('/analytics',authenticated,async (req,res)=>{
     try{
-        const totalOrders = await order.countDocuments({});
+        const range = req.query.range;
+
+        const startDate = new Date();
+        const endDate = new Date();
+
+        if(range === 'week'){
+            startDate.setDate(startDate.getDate() - 7);
+        }else if(range === 'days'){
+            startDate.setDate(startDate.getDate() - 30);
+        }else if(range === 'months'){
+            startDate.setMonth(startDate.getMonth() - 6);
+        }else if(range === 'years'){
+            startDate.setDate(startDate.getFullYear() - 1);
+        }else if(range == '0'){
+            startDate.setFullYear(startDate.getDate() - 0);
+        }
+
+        const dateFilter = {
+            createdAt : {
+                $gte : startDate,
+                $lte : endDate
+            }
+        };
+
+        const totalOrders = await order.countDocuments({
+            createdAt : {
+                $gte : startDate,
+                $lte : endDate
+            }
+        });
         console.log(totalOrders);
 
         const totalBuyers = await Users.aggregate([
             {
                 $match : {
+                    ...dateFilter,
                     isBuyer : true
                 }
             },
@@ -462,6 +501,7 @@ router.get('/analytics',async (req,res)=>{
         const totalProducts = await order.aggregate([
             {
                 $match : {
+                    ...dateFilter,
                     paymentStatus : 'paid'
                 }
             },
@@ -484,6 +524,7 @@ router.get('/analytics',async (req,res)=>{
         const totalRevenue = await order.aggregate([
             {
                 $match : {
+                    ...dateFilter,
                     paymentStatus : 'paid'
                 }
             },
@@ -530,5 +571,43 @@ router.get('/analytics',async (req,res)=>{
         res.status(500).send('Server Error');
     }
 });
+
+router.post('/add-product',authenticated,upload.single('file'),async (req,res)=>{
+    try {
+        console.log("Body:", req.body);
+        console.log("File:", req.file);
+        const {
+            productName ,
+            productTitle ,
+            productDescription ,
+            productPrice ,
+            productBrand ,
+            productCategory ,
+            sizes
+        } = req.body;
+
+        const image = req.file;
+
+        await Product.create({
+            name : productName ,
+            title : productTitle ,
+            description : productDescription ,
+            price : productPrice ,
+            brand : productBrand ,
+            category : productCategory ,
+            size: JSON.parse(sizes),
+            image: image ? image.filename : null
+        })
+
+        console.log("Added");
+        return res.status(201).json({
+            message: "Product added successfully"
+        });
+
+    }catch(error){
+        console.log(error.message);
+        return res.status(500).send("Internal Server Error");
+    }
+})
 
 module.exports = router;

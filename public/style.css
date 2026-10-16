@@ -1790,7 +1790,7 @@ header>div {
 }
 
 #top-products {
-    width: 600px;
+    width: 1200px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -1821,3 +1821,34 @@ header>div {
     color: var(--brown);
     font-size: 13px;
 }
+
+.divider {
+    width: 100%;
+    margin: 0;
+    border: none;
+    border-top: 1px solid var(--beige);
+}
+
+#dropdown {
+    margin-top: 16px;
+}
+
+#dropdown {
+    display: block;
+    margin-left: auto;
+    margin-right: 40px;
+    width: 140px;
+    padding: 10px 12px;
+    background: var(--ivory);
+    color: var(--dark-brown);
+    border: 1px solid var(--beige);
+    border-radius: 7px;
+    font-size: 14px;
+    outline: none;
+    cursor: pointer;
+}
+
+#dropdown:focus {
+    border-color: var(--taupe);
+}
+

@@ -18,6 +18,13 @@
 
         <hr class="divider">
 
+        <select type="dropdown" id="dropdown">
+            <option value="week">1 week</option>
+            <option value="days">30 days</option>
+            <option value="months">6 months</option>
+            <option value="years">1 year</option>
+        </select>
+
         <button id="sidebar-toggle" aria-label="Toggle sidebar" aria-expanded="false"> ☰ </button>
 
         <aside id="sidebar">
@@ -25,13 +32,10 @@
                 <a href="/buyers-details">👥 Buyers</a>
                 <hr>
 
-                <a href="/analytics">📈 Analytics</a>
+                <a href="/analytics?range=0">📈 Analytics</a>
                 <hr>
 
                 <a href="/orders-review">🛒 Orders</a>
-                <hr>
-
-                <a href="/products-show">👜 Products</a>
                 <hr>
 
                 <a href="/admin-profile">👤 Profile</a>
@@ -102,6 +106,7 @@
 
                     <div id="settings">
                         <div id="account-settings">Account Settings</div>
+                        <button id="addproductbtn">🛒 Add Product></button>
                         <a href="/forget-password">🗝️ Change Password</a>
                         <a href="/logout">🚪 Logout</a>
                     </div>
@@ -141,6 +146,7 @@
                     </div>
 
                     <div id="top-div">
+                        <h1>Top Selling Products</h1>
                         <% topSellingProducts.forEach((item)=>{ %>
 
                             <div id="top-products">
@@ -161,6 +167,92 @@
     </div>
 
     <script>
+
+        let div = document.createElement("div");
+        div.style.display='none';
+
+        function openDiv(){
+            div.style.display = 'block';
+            div.innerHTML = `
+                <input type="file" id="inputFile" accept="image/*"/>
+                <button id="fileSubmit" type="button">Submit</button>
+            `;
+
+            if (!div.isConnected) {
+                document.body.appendChild(div);
+            }
+
+            let fileSubmit = document.getElementById('fileSubmit');
+            fileSubmit.addEventListener("click",async (event)=>{
+            const fileInput = document.getElementById('inputFile');
+            const file = fileInput.files[0];
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('productName', productName);
+            formData.append('productTitle', productTitle);
+            formData.append('productDescription', productDescription);
+            formData.append('productPrice', productPrice);
+            formData.append('productBrand', productBrand);
+            formData.append('productCategory', productCategory);
+            formData.append('sizes', JSON.stringify(sizes));
+
+            try{
+            const result = await fetch('/add-product',{
+                method : 'POST',
+                body : formData
+            })
+
+            const data = await result.text();
+
+                if (result.ok) {
+                    alert('Product added successfully');
+                    div.style.display = 'none';
+                } else {
+                    alert(data || 'Failed to add product');
+                }
+
+            }catch(error){
+            console.log(error.message);
+            alert('Something went wrong');
+            }
+
+        });
+
+        }
+
+        let productName, productTitle, productDescription ,productPrice, productBrand, productCategory, sizes;
+
+        let addProductBtn = document.getElementById('addproductbtn');
+
+        addProductBtn.addEventListener("click", () => {
+
+            productName = prompt("Enter product name");
+            if (productName === null) return;
+
+            productTitle = prompt("Enter product title");
+            if (productTitle === null) return;
+
+            productDescription = prompt("Enter product description");
+            if (productDescription === null) return;
+
+            productPrice = prompt("Enter product price");
+            if (productPrice === null) return;
+
+            productBrand = prompt("Enter product brand");
+            if (productBrand === null) return;
+
+            productCategory = prompt("Enter product category");
+            if (productCategory === null) return;
+
+            const sizesInput = prompt("Enter sizes separated by commas");
+            if (sizesInput === null) return;
+
+            sizes = sizesInput.split(',').map(item => item.trim());
+
+            openDiv();
+        });
+    
         const toggleButton = document.getElementById("sidebar-toggle");
         const sidebar = document.getElementById("sidebar");
 
@@ -170,6 +262,17 @@
             toggleButton.setAttribute("aria-expanded", isOpen);
             toggleButton.textContent = isOpen ? "✕" : "☰";
         });
+
+        let dropdown = document.getElementById("dropdown");
+        dropdown.addEventListener("change",async (event)=>{
+            let valueinDrop = dropdown.value;
+            console.log(valueinDrop);
+
+            const res = await fetch(`/analytics?range=${valueinDrop}`);
+        });
+
+        
+    
     </script>
 
 </body>
