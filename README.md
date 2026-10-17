@@ -61,48 +61,6 @@ VELNORA is a full-stack fashion e-commerce web application designed to provide a
 | Razorpay | Online payment processing |
 | dotenv | Environment variable management |
 
-## 📁 Project Structure
-
-The project follows a MVC structure. The exact file names may vary depending on your implementation.
-
-e-commerce/
-├── config/
-│   └── database.js
-├── models/
-│   ├── user.js
-│   ├── products.js
-│   ├── cart.js
-│   └── order.js
-├── controllers/
-│   ├── app_controllers.js
-│   └── auth_controllers.js
-├── routes/
-│   ├── authentication.js
-│   └── products.js
-├── middlewares/
-│   └── protected_route_middleware.js
-├── scripts/
-│   └── seedAdmin.js
-├── views/
-│   ├── dashboard.ejs
-│   ├── productDetails.ejs
-│   ├── category.ejs
-│   ├── cart.ejs
-│   ├── placeOrder.ejs
-│   ├── orders.ejs
-│   ├── history.ejs
-│   └── partials/
-├── public/
-│   ├── style.css
-│   ├── images/
-│   └── js/
-|── utils/
-|   |──membershipBenifits.js
-├── .env
-├── .gitignore
-├── package.json
-└── server.js
-
 ## Installation and Setup
 
 ### 1. Clone the repository
