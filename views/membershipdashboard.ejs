@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+    <main class="membership-dashboard">
+        <div style="display: flex; flex-direction: column; text-align: center; gap: 15px; margin: 10px 0;">
+            <p>VELNORA / MY ACCOUNT</p>
+            <h1>My Membership</h1>
+            <p>Your membership details, all in one place.</p>
+        </div>
+        
+
+        <section class="membership-card">
+            <h1><%= subscription.plan %> Plan</h1>
+            <p>Your membership payment has been verified.</p>
+
+            <div class="membership-details">
+                <div class="detail">
+                    <p>Membership Status</p>
+                    <h2><%= isActive ? 'Active' : 'Expired' %></h2>
+                </div>
+
+                <div class="detail">
+                    <p>Available Shopping Credits</p>
+                    <h2><%= subscription.credits %></h2>
+                </div>
+
+                <div class="detail">
+                    <p>Plan Price</p>
+                    <h2>₹<%= (subscription.price / 100).toFixed(2) %></h2>
+                </div>
+
+                <div class="detail">
+                    <p>Member Since</p>
+                    <h2>
+                        <%= new Date(subscription.createdAt).toLocaleDateString('en-IN') %>
+                    </h2>
+                </div>
+            </div>
+
+            <a href="/all" class="shop-button">Shop Now</a>
+        </section>
+    </main>
+</body>
+</html>

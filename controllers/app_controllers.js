@@ -9,6 +9,9 @@ const Product = require('../models/products.js');
 const cartProducts = require('../models/cart.js');
 const order = require('../models/order.js');
 const Users = require('../models/user.js');
+const path = require('path');
+const Subscription = require('../models/subscription.js');
+const benifitFunction = require('../utils/membershipBenifits.js');
 
 router.use(express.static('public'));
 router.use(express.json());
@@ -22,9 +25,10 @@ const razorpay = new Razorpay({
 
 const authenticated = require('../middlewares/protected_route_middleware');
 
+
 const storage = multer.diskStorage({
     destination : function (req,file,cb){
-        cb(null,'uploads')
+        cb(null,path.join(__dirname, '../public/images'));
     }
 });
 
@@ -596,7 +600,7 @@ router.post('/add-product',authenticated,upload.single('file'),async (req,res)=>
             brand : productBrand ,
             category : productCategory ,
             size: JSON.parse(sizes),
-            image: image ? image.filename : null
+            image: image ? `/images/${image.filename}` : null
         })
 
         console.log("Added");
@@ -608,6 +612,154 @@ router.post('/add-product',authenticated,upload.single('file'),async (req,res)=>
         console.log(error.message);
         return res.status(500).send("Internal Server Error");
     }
-})
+});
+
+router.get('/subscription',authenticated,async(req,res)=>{
+    res.render('subscription');
+});
+
+router.get('/plans',authenticated,async(req, res) => {
+    try {
+        const plan = req.query.plan;
+
+        if (plan === 'Essential' || plan === 'Premium') {
+            return res.render('confirmation', {
+                planName: plan
+            });
+        }
+
+        return res.redirect('/subscription');
+
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).send('Internal Server Error');
+    }
+});
+
+router.post('/buy-plan',authenticated,async (req,res)=>{
+    try{
+        const plan = req.query.plan;
+
+        const prices = {
+            Essential : {
+                amount : 900,
+                credits : 10
+            },
+            Premium : {
+                amount : 1900,
+                credits : 20
+            }
+        }
+
+        const selectedPlan = prices[plan];
+
+        const razorpayOrder = await razorpay.orders.create({
+            amount : selectedPlan.amount,
+            currency : 'INR',
+            receipt : `receipt_${Date.now()}`
+        });
+
+        await Subscription.create({
+            userId : req.user._id,
+            plan : plan,
+            price : selectedPlan.amount,
+            credits : selectedPlan.credits,
+            paymentStatus : 'pending',
+            razorpayOrderId : razorpayOrder.id
+        })
+
+        res.json({
+            amount : razorpayOrder.amount,
+            razorpayOrderId : razorpayOrder.id,
+            currency : razorpayOrder.currency,
+            key : process.env.RAZORPAY_KEY_ID
+        });
+
+    }catch(error){
+        console.log(error);
+        res.status(500).send("Internal Server Error");
+    }
+    
+});
+
+router.post('/verify-membership',authenticated,async(req,res)=>{
+    try{
+        const {
+            razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature
+        } = req.body;
+
+        const subscription = await Subscription.findOne({
+            userId: req.user._id,
+            razorpayOrderId: razorpay_order_id,
+            paymentStatus: 'pending'
+        });
+
+        if (!subscription) {
+            return res.status(404).json({
+                success: false,
+                message: 'Pending subscription not found'
+            });
+        }
+
+        const generatedSignature = crypto
+                                .createHmac('sha256',process.env.RAZORPAY_KEY_SECRET)
+                                .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+                                .digest('hex');
+
+        if(generatedSignature !== razorpay_signature){
+            return res.status(400).json({
+                success : false,
+                message : 'Invalid payment signature'
+            });
+        }
+
+        subscription.paymentStatus = 'paid';
+
+        const activatedAt = new Date();
+        const expiresAt = new Date(activatedAt);
+        expiresAt.setMonth(expiresAt.getMonth()+1);
+
+        subscription.activatedAt = activatedAt;
+        subscription.expiresAt = expiresAt;
+
+        await subscription.save();
+
+        return res.json({
+            success : true,
+            message : 'Payment Done'
+        })
+    }catch(error){
+        console.log(error.message);
+        return res.status(500).json({
+            success: false,
+            message: 'Internal Server Error'
+        });
+    }
+
+});
+
+router.get('/membership-dashboard',authenticated,async(req,res)=>{
+    try{
+
+        const subscription = await Subscription.findOne({
+            userId : req.user._id,
+            paymentStatus : 'paid'
+        }).sort({ createdAt : -1 });
+
+        if(!subscription){
+            return red.redirect('/subscription');
+        }
+
+        const isActive = subscription.expiresAt && expiresAt.Date.now();
+
+        res.render('membershipdashboard',{ subscription , isActive  });
+
+    }catch(error){
+        return res.status(500).send("Internal Server Error");
+    }
+
+});
 
 module.exports = router;

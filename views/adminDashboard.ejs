@@ -225,33 +225,35 @@
 
         let addProductBtn = document.getElementById('addproductbtn');
 
-        addProductBtn.addEventListener("click", () => {
+        if (addProductBtn) {
+                addProductBtn.addEventListener("click", () => {
 
-            productName = prompt("Enter product name");
-            if (productName === null) return;
+                productName = prompt("Enter product name");
+                if (productName === null) return;
 
-            productTitle = prompt("Enter product title");
-            if (productTitle === null) return;
+                productTitle = prompt("Enter product title");
+                if (productTitle === null) return;
 
-            productDescription = prompt("Enter product description");
-            if (productDescription === null) return;
+                productDescription = prompt("Enter product description");
+                if (productDescription === null) return;
 
-            productPrice = prompt("Enter product price");
-            if (productPrice === null) return;
+                productPrice = prompt("Enter product price");
+                if (productPrice === null) return;
 
-            productBrand = prompt("Enter product brand");
-            if (productBrand === null) return;
+                productBrand = prompt("Enter product brand");
+                if (productBrand === null) return;
 
-            productCategory = prompt("Enter product category");
-            if (productCategory === null) return;
+                productCategory = prompt("Enter product category");
+                if (productCategory === null) return;
 
-            const sizesInput = prompt("Enter sizes separated by commas");
-            if (sizesInput === null) return;
+                const sizesInput = prompt("Enter sizes separated by commas");
+                if (sizesInput === null) return;
 
-            sizes = sizesInput.split(',').map(item => item.trim());
+                sizes = sizesInput.split(',').map(item => item.trim());
 
-            openDiv();
-        });
+                openDiv();
+            });
+        }
     
         const toggleButton = document.getElementById("sidebar-toggle");
         const sidebar = document.getElementById("sidebar");

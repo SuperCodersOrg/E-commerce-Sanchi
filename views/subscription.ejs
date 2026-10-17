@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body id="subscription-page">
+
+    <div id="subscription-header">
+        <div>VELNORA</div>
+        <div>Membership</div>
+        <a href="/membership-dashboard"><button id="member">My MemberShip</button></a>
+    </div>
+
+    <div id="subscription-img">
+        <img src="/subscription-page-image.jpeg" alt="image">
+    </div>
+
+    <h2>Unlock subscription benifits with VELNORA membership.</h2>
+
+    <div id="subscription-plans">
+
+        <div id="planOne">
+            <h3>ESSENTIAL</h3>
+            <h2>$9 /month</h2>
+            <div id="offers">
+                <div>✔️ 10 Shopping Credits</div>
+                <div>✔️ Exclusive Discounts</div>
+                <div>✔️ Coupens</div>
+            </div>
+            <button type="button" id="planBtnone" onclick="choosePlan('Essential')">Choose Plan</button>
+        </div>
+
+        <div id="planTwo">
+            <h3>PREMIUM</h3>
+            <h2>$19 /month</h2>
+            <div id="offers">
+                <div>✔️ 20 Shopping Credits</div>
+                <div>✔️ Better Exclusive Discounts</div>
+                <div>✔️ Delivery Fee Benifits</div>
+                <div>✔️ Early pre-orders access</div>
+            </div>
+            <button id="planBtntwo" type="button" onclick="choosePlan('Premium')">Choose Plan</button>
+        </div>
+
+    </div>
+
+    <p id="subscription-para">Membership benefits and terms will be confirmed after payment.</p>
+
+</body>
+<script>
+    function choosePlan(plan) {
+        console.log(plan);
+        window.location.href = `/plans?plan=${plan}`;
+    }
+</script>
+</html>

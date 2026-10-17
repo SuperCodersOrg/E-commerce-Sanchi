@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body id="confirmation-page">
+
+    <h1>VELNORA</h1>
+    <h2>Confirm Your Membership</h2>
+
+    <div id="confirmation-box">
+
+        <% if(planName === 'Essential') { %>
+            <div id="essential-box">
+                <div id="plan-name"> Essential </div>
+                <div id="plan-price">Subscription: $9</div>
+                <div id="plan-credits">Shopping Credits: 10</div>
+            </div>
+        <% } %>
+
+        <% if(planName == 'Premium') { %>
+            <div id="premium-box">
+                <div id="plan-name"> Premium </div>
+                <div id="plan-price">Subscription: $19</div>
+                <div id="plan-credits">Shopping Credits: 20</div>
+            </div>
+        <% } %>
+    </div>
+    
+    <button id="buyButton" type="button" onclick="buyNow('<%= planName %>')">Buy Now</button>
+</body>
+<script>
+
+    async function buyNow(plan){
+        const result = await fetch(`/buy-plan?plan=${plan}`,{
+            method : 'POST',
+            headers : {
+                'Content-Type' : 'application/json',
+            },
+            body : JSON.stringify({ plan })
+        })
+
+        const data = await result.json();
+
+        const options = {
+            key : data.key,
+            amount : data.amount,
+            currency : data.currency,
+            order_id : data.razorpayOrderId,
+            name : 'VELNORA',
+            description : `${plan} Membership`,
+            handler : async function (response){
+                const res = await fetch('/verify-membership',{
+                    method : 'POST',
+                    headers : {
+                        'Content-Type' : 'application/json'
+                    },
+                    body: JSON.stringify({
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                });
+                const data = await res.json();
+                if(data.ok || data.success){
+                    alert('Payment verified! Subscription activated.');
+                    window.location.href = '/subscription';
+                }else {
+                    alert(data.message || 'Payment verification failed');
+                }
+            }
+        };
+
+        const razorpayObject = new Razorpay(options);
+        razorpayObject.open();
+
+    }
+    
+</script>
+</html>

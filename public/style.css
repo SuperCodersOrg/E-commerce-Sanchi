@@ -1590,7 +1590,7 @@ header>div {
     background: var(--cream);
 }
 
-#admin-content:has(#admin-box) > h1 {
+#admin-content:has(#admin-box)>h1 {
     width: 100%;
     color: var(--dark-brown);
     font-size: 28px;
@@ -1637,12 +1637,12 @@ header>div {
     overflow-wrap: anywhere;
 }
 
-#admins_details > div:not(#admins_name) {
+#admins_details>div:not(#admins_name) {
     color: var(--brown);
     font-size: 14px;
 }
 
-#admins_details > div:last-child {
+#admins_details>div:last-child {
     margin-top: 5px;
     padding: 8px 15px;
     background: var(--beige);
@@ -1700,7 +1700,7 @@ header>div {
     font-weight: 600;
 }
 
-#admin-content:has(#stat-details) > p {
+#admin-content:has(#stat-details)>p {
     margin: 0 0 25px;
     color: var(--brown);
     font-size: 22px;
@@ -1852,3 +1852,300 @@ header>div {
     border-color: var(--taupe);
 }
 
+#subscription-page {
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+#subscription-header {
+    width: 100%;
+    min-height: 80px;
+    padding: 20px 6%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--ivory);
+    border-bottom: 1px solid var(--beige);
+}
+
+#subscription-header div:first-child {
+    font-size: 27px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: var(--brown);
+}
+
+#subscription-header div:last-child {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+#subscription-img {
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    background: var(--beige);
+}
+
+#subscription-img img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+}
+
+#subscription-page>h2 {
+    max-width: 750px;
+    margin: 45px auto 35px;
+    padding: 0 20px;
+    text-align: center;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+#subscription-plans {
+    width: 90%;
+    max-width: 950px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px;
+    align-items: stretch;
+}
+
+#planOne,
+#planTwo {
+    min-width: 0;
+    padding: 35px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background: var(--ivory);
+    border: 1px solid var(--beige);
+    border-radius: 10px;
+    box-shadow: 0 5px 18px rgba(48, 37, 30, 0.06);
+}
+
+#planTwo {
+    border: 1px solid var(--taupe);
+}
+
+#planOne h3,
+#planTwo h3 {
+    margin-bottom: 20px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--brown);
+}
+
+#planOne>h2,
+#planTwo>h2 {
+    margin-bottom: 28px;
+    font-size: 35px;
+    font-weight: 400;
+    color: var(--dark-brown);
+}
+
+#offers {
+    width: 100%;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+#offers div {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--beige);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--brown);
+}
+
+#planOne button,
+#planTwo button {
+    width: 100%;
+    margin-top: auto;
+    padding: 15px;
+    background: var(--brown);
+    color: var(--ivory);
+    border: 1px solid var(--brown);
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    transition: background 0.2s, color 0.2s;
+}
+
+#planOne button:hover,
+#planTwo button:hover {
+    background: var(--ivory);
+    color: var(--brown);
+    transform: none;
+}
+
+#subscription-para {
+    margin: 30px 15px 45px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #887765;
+}
+
+/* MEMBERSHIP CONFIRMATION PAGE */
+
+#confirmation-page {
+    min-height: 100vh;
+    margin: 0;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    background: var(--cream);
+    color: var(--dark-brown);
+    font-family: Georgia, "Times New Roman", serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#confirmation-page>h1 {
+    margin: 10px 0 35px;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--brown);
+}
+
+#confirmation-page>h2 {
+    margin: 0 0 30px;
+    font-size: 28px;
+    font-weight: 400;
+    text-align: center;
+}
+
+#confirmation-box {
+    width: 100%;
+    max-width: 440px;
+    box-sizing: border-box;
+}
+
+#essential-box,
+#premium-box {
+    display: flex;
+    flex-direction: column;
+    padding: 35px 30px;
+    background: var(--ivory);
+    border: 1px solid var(--beige);
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(48, 37, 30, 0.08);
+}
+
+#premium-box {
+    border-color: var(--taupe);
+}
+
+#confirmation-page #plan-name {
+    margin-bottom: 25px;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-align: center;
+    color: var(--brown);
+}
+
+#confirmation-page #plan-price {
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--beige);
+    font-size: 24px;
+    text-align: center;
+}
+
+#confirmation-page #plan-credits {
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    text-align: center;
+    color: var(--brown);
+}
+
+#confirmation-page>a {
+    width: 100%;
+    max-width: 440px;
+    margin-top: 25px;
+    text-decoration: none;
+}
+
+#confirmation-page>a button {
+    width: 100%;
+    padding: 16px;
+    border: 1px solid var(--brown);
+    border-radius: 8px;
+    background: var(--brown);
+    color: var(--ivory);
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+#confirmation-page>a button:hover {
+    background: var(--ivory);
+    color: var(--brown);
+}
+
+.membership-dashboard {
+    max-width: 850px;
+    margin: 60px auto;
+    padding: 30px;
+}
+
+.membership-card {
+    padding: 60px;
+    border: 1px solid #e5ded3;
+    border-radius: 16px;
+    background: #faf7f1;
+}
+
+.membership-card h1 {
+    margin-bottom: 10px;
+}
+
+.membership-details {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.detail {
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+}
+
+.detail p {
+    margin: 0 0 8px;
+    color: #766f65;
+}
+
+.detail h2 {
+    margin: 0;
+}
+
+.shop-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #29251f;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+}
