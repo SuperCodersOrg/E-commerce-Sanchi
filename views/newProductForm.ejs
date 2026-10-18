@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+    <div id="add-product-modal">
+    <form method="POST" id="add-product-form" enctype="multipart/form-data" action="/add-product">
+
+        <h2>Add New Product</h2>
+
+        <label>Product Name</label>
+        <input type="text" name="productName" required>
+
+        <label>Product Title</label>
+        <input type="text" name="productTitle" required>
+
+        <label>Description</label>
+        <textarea name="productDescription" required></textarea>
+
+        <label>Price ($)</label>
+        <input type="number" name="productPrice" min="0" required>
+
+        <label>Brand</label>
+        <input type="text" name="productBrand" required>
+
+        <label>Category</label>
+        <input type="text" name="productCategory" required>
+
+        <label>Sizes (comma separated)</label>
+        <input
+            type="text"
+            id="sizesInput"
+            name="sizes"
+            placeholder="36, 37, 38, 39"
+            required
+        >
+
+        <label>Product Image</label>
+        <input type="file" name="file" required>
+
+        <button type="submit">Add Product</button>
+        <button type="button" id="close-product-form">Cancel</button>
+
+    </form>
+</div>
+</body>
+</html>

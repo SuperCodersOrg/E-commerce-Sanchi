@@ -2149,3 +2149,46 @@ header>div {
     text-decoration: none;
     border-radius: 6px;
 }
+
+#add-product-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+#add-product-form {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 25px;
+    background: #FFFCF7;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#add-product-form h2 {
+    color: #5C493A;
+}
+
+#add-product-form input,
+#add-product-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    border: 1px solid #B5A48F;
+    border-radius: 6px;
+    font: inherit;
+}
+
+#add-product-form button {
+    padding: 11px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #702c3b;
+    color: white;
+}

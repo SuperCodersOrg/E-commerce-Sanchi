@@ -70,10 +70,10 @@
                             <% item.items.forEach((object)=>{ %>
 
                                 <div class="order-product">
-                                    <img src="<%= object.image %>" alt="<%= object.description %>">
+                                    <img src="<%= object.productId.image %>" alt="<%= object.productId.description %>">
                                     
                                     <div id="product-details">
-                                        <div id="product-details-name"><%= object.name %></div>
+                                        <div id="product-details-name"><%= object.productId.name %></div>
                                         <div id="product-details-quantity">Qty: <%= object.quantity %></div>
                                     </div>
 
@@ -106,7 +106,7 @@
 
                     <div id="settings">
                         <div id="account-settings">Account Settings</div>
-                        <button id="addproductbtn">🛒 Add Product></button>
+                        <a href="/add-new-product-form"><button id="addproductbtn">🛒 Add Product></button></a>
                         <a href="/forget-password">🗝️ Change Password</a>
                         <a href="/logout">🚪 Logout</a>
                     </div>
@@ -151,6 +151,7 @@
 
                             <div id="top-products">
 
+                                <img src="<%= item.image %>" alt="<%= item.name %>" width="80">
                                 <div id="top-products-name"><%= item.name %></div>
                                 <div id="top-products-qty">Units Sold: <%= item.totalQuantitySold %></div>
 
@@ -168,92 +169,92 @@
 
     <script>
 
-        let div = document.createElement("div");
-        div.style.display='none';
+        // let div = document.createElement("div");
+        // div.style.display='none';
 
-        function openDiv(){
-            div.style.display = 'block';
-            div.innerHTML = `
-                <input type="file" id="inputFile" accept="image/*"/>
-                <button id="fileSubmit" type="button">Submit</button>
-            `;
+        // function openDiv(){
+        //     div.style.display = 'block';
+        //     div.innerHTML = `
+        //         <input type="file" id="inputFile" accept="image/*"/>
+        //         <button id="fileSubmit" type="button">Submit</button>
+        //     `;
 
-            if (!div.isConnected) {
-                document.body.appendChild(div);
-            }
+        //     if (!div.isConnected) {
+        //         document.body.appendChild(div);
+        //     }
 
-            let fileSubmit = document.getElementById('fileSubmit');
-            fileSubmit.addEventListener("click",async (event)=>{
-            const fileInput = document.getElementById('inputFile');
-            const file = fileInput.files[0];
+        //     let fileSubmit = document.getElementById('fileSubmit');
+        //     fileSubmit.addEventListener("click",async (event)=>{
+        //     const fileInput = document.getElementById('inputFile');
+        //     const file = fileInput.files[0];
 
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('productName', productName);
-            formData.append('productTitle', productTitle);
-            formData.append('productDescription', productDescription);
-            formData.append('productPrice', productPrice);
-            formData.append('productBrand', productBrand);
-            formData.append('productCategory', productCategory);
-            formData.append('sizes', JSON.stringify(sizes));
+        //     const formData = new FormData();
+        //     formData.append('file', file);
+        //     formData.append('productName', productName);
+        //     formData.append('productTitle', productTitle);
+        //     formData.append('productDescription', productDescription);
+        //     formData.append('productPrice', productPrice);
+        //     formData.append('productBrand', productBrand);
+        //     formData.append('productCategory', productCategory);
+        //     formData.append('sizes', JSON.stringify(sizes));
 
-            try{
-            const result = await fetch('/add-product',{
-                method : 'POST',
-                body : formData
-            })
+        //     try{
+        //     const result = await fetch('/add-product',{
+        //         method : 'POST',
+        //         body : formData
+        //     })
 
-            const data = await result.text();
+        //     const data = await result.text();
 
-                if (result.ok) {
-                    alert('Product added successfully');
-                    div.style.display = 'none';
-                } else {
-                    alert(data || 'Failed to add product');
-                }
+        //         if (result.ok) {
+        //             alert('Product added successfully');
+        //             div.style.display = 'none';
+        //         } else {
+        //             alert(data || 'Failed to add product');
+        //         }
 
-            }catch(error){
-            console.log(error.message);
-            alert('Something went wrong');
-            }
+        //     }catch(error){
+        //     console.log(error.message);
+        //     alert('Something went wrong');
+        //     }
 
-        });
+        // });
 
-        }
+        // }
 
-        let productName, productTitle, productDescription ,productPrice, productBrand, productCategory, sizes;
+        // let productName, productTitle, productDescription ,productPrice, productBrand, productCategory, sizes;
 
-        let addProductBtn = document.getElementById('addproductbtn');
+        // let addProductBtn = document.getElementById('addproductbtn');
 
-        if (addProductBtn) {
-                addProductBtn.addEventListener("click", () => {
+        // if (addProductBtn) {
+        //         addProductBtn.addEventListener("click", () => {
 
-                productName = prompt("Enter product name");
-                if (productName === null) return;
+        //         productName = prompt("Enter product name");
+        //         if (productName === null) return;
 
-                productTitle = prompt("Enter product title");
-                if (productTitle === null) return;
+        //         productTitle = prompt("Enter product title");
+        //         if (productTitle === null) return;
 
-                productDescription = prompt("Enter product description");
-                if (productDescription === null) return;
+        //         productDescription = prompt("Enter product description");
+        //         if (productDescription === null) return;
 
-                productPrice = prompt("Enter product price");
-                if (productPrice === null) return;
+        //         productPrice = prompt("Enter product price");
+        //         if (productPrice === null) return;
 
-                productBrand = prompt("Enter product brand");
-                if (productBrand === null) return;
+        //         productBrand = prompt("Enter product brand");
+        //         if (productBrand === null) return;
 
-                productCategory = prompt("Enter product category");
-                if (productCategory === null) return;
+        //         productCategory = prompt("Enter product category");
+        //         if (productCategory === null) return;
 
-                const sizesInput = prompt("Enter sizes separated by commas");
-                if (sizesInput === null) return;
+        //         const sizesInput = prompt("Enter sizes separated by commas");
+        //         if (sizesInput === null) return;
 
-                sizes = sizesInput.split(',').map(item => item.trim());
+        //         sizes = sizesInput.split(',').map(item => item.trim());
 
-                openDiv();
-            });
-        }
+        //         openDiv();
+        //     });
+        // }
     
         const toggleButton = document.getElementById("sidebar-toggle");
         const sidebar = document.getElementById("sidebar");

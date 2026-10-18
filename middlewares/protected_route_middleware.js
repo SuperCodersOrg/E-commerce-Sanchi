@@ -10,7 +10,7 @@ const authenticated = ((req,res,next)=>{
     const token = req.cookies.Access_Token;
 
     if(!token){
-       res.render("login");
+       return res.redirect('/login');
     }
 
     try{
@@ -22,7 +22,8 @@ const authenticated = ((req,res,next)=>{
         }
     }
     catch(error){
-        res.render("login");
+        res.clearCookie('Access_Token');
+        return res.redirect('/login');
     }
 });
 

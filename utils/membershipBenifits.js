@@ -5,16 +5,15 @@ async function getMembershipBenifits(userId){
     const subscribedUsers = await Subscription.findOne({
         paymentStatus : 'paid',
         userId,
-        expiresAt : { $gt : Date.now() }
-    })
+        expiresAt : { $gt : new Date() }
+    }).sort({ createdAt : -1 })
 
     if (!subscribedUsers) {
         return {
             plan: null,
             discountPercent: 0,
             deliveryDiscountPercent: 0,
-            freeDelivery: false,
-            couponCode: null,
+            freeDelivery: false
         };
     }
 
@@ -23,8 +22,7 @@ async function getMembershipBenifits(userId){
             plan : 'Essential',
             discountPercent : 5,
             deliveryDiscountPercent : 5,
-            freeDelivery : false,
-            couponCode : VELNORA5,
+            freeDelivery : false
         }
     }
 
@@ -32,9 +30,8 @@ async function getMembershipBenifits(userId){
         return {
             plan : 'Premium',
             discountPercent : 10,   
-            deliveryDiscountPercent : 10,
-            freeDelivery : true,
-            couponCode : VELNORA10,
+            deliveryDiscountPercent : 100,
+            freeDelivery : true
         }
     }
 }
