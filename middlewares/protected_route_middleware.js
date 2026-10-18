@@ -7,8 +7,11 @@ const router = express.Router();
 router.use(cookie_parser());
 
 const authenticated = ((req,res,next)=>{
-    const token = req.cookies.Access_Token;
+    const user_token = req.cookies.Access_Token;
+    const admin_token = req.cookies.ADMIN_Access_Token;
 
+    const token = user_token || admin_token;
+    
     if(!token){
        return res.redirect('/login');
     }

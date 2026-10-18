@@ -33,6 +33,15 @@ router.get('/reset-password/:token',(req,res)=>{
     }
 });
 
+router.get('/logout', (req, res) => {
+    res.clearCookie('Access_Token');
+    res.redirect('/login');
+});
+
+router.get('/verify/:email/:token',(req,res)=>{
+    res.render('verify' , { email : req.params.email , token : req.params.token });
+});
+
 router.post('/login', async (req,res)=>{
     const { name , email , password } = req.body;
 
@@ -42,6 +51,17 @@ router.post('/login', async (req,res)=>{
 
     const user = await User.findOne({ email , isAdmin : true });
     if(user){
+
+        const ACCESS_TOKEN = jwt.sign(
+            { name : user.name , email : user.email , _id : user._id },
+            process.env.JWT_SECRET,
+            { expiresIn : '2h' }
+        );
+
+        res.cookie('ADMIN_Access_Token',ACCESS_TOKEN,{
+            httpOnly : true
+        });
+
         return res.redirect('/admin-dashboard',);
     }
 
@@ -117,10 +137,6 @@ router.post('/signin',async (req,res)=>{
         })
         return res.status(500).send(error);
     }
-});
-
-router.get('/verify/:email/:token',(req,res)=>{
-    res.render('verify' , { email : req.params.email , token : req.params.token });
 });
 
 router.post('/verify/:email/:token',async (req,res)=>{
@@ -234,9 +250,6 @@ router.post('/reset-password/:token',async (req,res)=>{
 
 });
 
-router.get('/logout', (req, res) => {
-    res.clearCookie('Access_Token');
-    res.redirect('/login');
-});
+
 
 module.exports = router;
