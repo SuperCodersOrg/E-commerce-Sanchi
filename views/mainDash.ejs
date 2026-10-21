@@ -14,12 +14,13 @@
             <div id="btns">
                 <a href="/login"><span id="main_login_btn"><button>Login</button></a>
                 <a href="/signin"><span id="main_signin_btn"><button>Signin</button></a> 
+                <a href="/cart-page" id="cart_icon"> 🛒 Cart </a>
             </div>
         </div>
     </header>
     <div id="products">
         <%  Products.forEach((product,index) => { %>
-            <div class="product-card" data-id="<%= product._id %>">
+            <div class="product-card" data-id="<%= product._id %>" data-name="<%= product.name %>" data-description="<%= product.description %>" data-price="<%= product.price %>" data-category="<%= product.category %>" data-image="<%= product.image %>">
                 <img src="<%= product.image %>" alt="<% product.description %>"/>
                 <h2><%= product.name %></h2>
                 <button class="dash_cart" type="button">Add To Cart</button>
@@ -29,16 +30,59 @@
     </div>
 </body>
 <script>
-    let productList = document.getElementById("products");
-    productList.addEventListener("click",(event)=>{
-        if(event.target.closest('.dash_cart')){
-            Swal.fire({
+    let cart_icon = document.getElementById("cart_icon");
+    cart_icon.addEventListener("click",async ()=>{
+        if(!isLoggedIn){
+            event.preventDefault();
+            await Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: "Signup to add in your cart",
+                text: "Signup to see your cart",
                 footer: "Already have an account? <a href='/login'>Login</a>"
             });
         }
-    })
+    });
+
+    function getGuestCart(){
+        return JSON.parse(localStorage.getItem('Product') || '[]');
+    }
+
+    function saveGuestCart(product){
+        console.log('saved');
+        localStorage.setItem('Product',JSON.stringify(product));
+    }
+
+    const isLoggedIn = <%- JSON.stringify(isLoggedin) %>;
+    let productList = document.getElementById("products");
+    productList.addEventListener("click",async (event)=>{
+        if(event.target.closest('.dash_cart')){
+            const button = event.target.closest('.dash_cart');
+            const card_product = button.closest(".product-card");
+
+            const product = {
+                productId : card_product.dataset.id,
+                name : card_product.dataset.name,
+                description : card_product.dataset.description,
+                image : card_product.dataset.image,
+                category : card_product.dataset.category,
+                price : Number(card_product.dataset.price),
+                quantity : 1
+            }
+
+            const products = getGuestCart();
+            console.log(products);
+            const existing = products.find((item)=>{
+                return item.productId === product.productId;
+            })
+
+            if(existing){
+                existing.quantity += 1;
+            }else{
+                products.push(product);
+            }
+
+            saveGuestCart(products);
+        }
+    });
 </script>
 </html>

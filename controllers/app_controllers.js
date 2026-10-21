@@ -32,14 +32,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.get('/dashboard', authenticated, async (req,res)=>{
+router.get('/dashboard', async (req,res)=>{
     try{
         const products = await Product.find()
                     .sort({ _id : 1 })
                     .limit(4);
 
         res.render('dashboard' ,  { 
-            
             Products : products
         });
     }catch(error){

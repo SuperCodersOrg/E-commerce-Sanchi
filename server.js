@@ -9,6 +9,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 const { router : authRoutes } = require('./routes/authRoutes.js');
 const  appRoutes  = require('./routes/appRoutes.js');
 const Product = require('./models/products.js');
+const jwt = require('jsonwebtoken');
 
 mongoDB();
 
@@ -23,8 +24,20 @@ app.get('/',async (req,res)=>{
     try{
         const Products = await Product.find()
                     .sort({ _id : 1 });
+
+        let isLoggedin = false;
+        const token = req.cookies?.Access_Token;
+
+        if(token){
+            const verified = JsonWebTokenError.verify(token,process.env.JWT_SECRET);
+            isLoggedin = true;
+        }else{
+            isLoggedin = false;
+        }
+
         res.render('mainDash' ,  { 
-            Products
+            Products,
+            isLoggedin
         });
     }catch(error){
         console.log(error);
