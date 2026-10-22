@@ -62,7 +62,6 @@ VELNORA is a full-stack fashion e-commerce web application designed to provide a
 | dotenv | Environment variable management |
 
 ## Installation and Setup
-
 ### 1. Clone the repository
 ```bash
 git clone <your-repository-url>
@@ -161,6 +160,5 @@ BCA (Hons) — Artificial Intelligence
 
 Built as a full-stack web development project.
 
----
 
 *VELNORA — Elegance in Every Step.*
