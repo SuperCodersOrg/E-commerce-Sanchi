@@ -7,7 +7,6 @@ const cookie_parser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const User = require('../models/user');
-const CartProducts = require('../models/CartProducts');
 
 router.use(express.json());
 router.use(express.urlencoded({ extended : true }));

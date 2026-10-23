@@ -809,4 +809,44 @@ router.post('/verify-membership',authenticated,async(req,res)=>{
 
 });
 
+router.post('/sync-cart',authenticated,async (req,res)=>{
+    try{
+        const syncCards = req.body.carts;
+        if(!Array.isArray){
+            return res.status(400).json({
+                    message: 'Invalid cart data'
+                });
+        }
+        for(const item of syncCards){
+            const existing = await cartProducts.findOne({
+                productId : item.productId,
+                userId
+            });
+            if(existing){
+                existing.quantity += Number(item.quantity) || 1;
+                existing.save();
+            }else{
+                await cartProducts.create({
+                    userId : userId,
+                    productId : item._id,
+                    image : item.image,
+                    name : item.name,
+                    description : item.description,
+                    price : item.price,
+                    category : item.category,
+                    quantity : Number(item.quantity) || 1
+                });
+
+                return res.status(200).json({
+                    message : 'Cart created successfully'
+                });
+            }
+        }
+    }catch(error){
+        console.log(error.message);
+        return res.status(500).send('There is a server issue');
+    }
+    
+})
+
 module.exports = router;

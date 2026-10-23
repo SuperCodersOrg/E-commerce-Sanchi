@@ -41,6 +41,9 @@
                 footer: "Already have an account? <a href='/login'>Login</a>"
             });
         }
+        else{
+            syncCart();
+        }
     });
 
     function getGuestCart(){
@@ -58,7 +61,6 @@
         if(event.target.closest('.dash_cart')){
             const button = event.target.closest('.dash_cart');
             const card_product = button.closest(".product-card");
-
             const product = {
                 productId : card_product.dataset.id,
                 name : card_product.dataset.name,
@@ -84,5 +86,38 @@
             saveGuestCart(products);
         }
     });
+
+    async function syncCart(){
+        try{    
+            const carts = await getGuestCart();
+
+            if(carts.length === 0){
+                return res.send('Cart is empty');
+            }
+
+            const result = fetch('/sync-cart',{
+                    method : 'POST',
+                    headers : {
+                     'Content-Type' : 'application/json'
+                    },
+                    body : JSON.stringify(carts)
+            });
+
+            const response = await result.josn();
+
+            if(!response.ok){
+                console.log(result.message);
+                return res.send('Failed to fetch products');
+            }else{
+                localStorage.removeItem('Product');
+                return res.send('Products added successfully');
+            }
+        }catch(error){
+            return res.status(500).send('Internal server error');
+        }
+        
+    }
+
+    localStorage.clear();
 </script>
 </html>
