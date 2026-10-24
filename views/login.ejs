@@ -11,6 +11,7 @@
     <form id="login_form" method="post" action="/login">
         <input id="log_name" type="text" name="name" placeholder="name"/>
         <input id="log_email" type="email" name="email" placeholder="email"/>
+        <input type="hidden" name="syncCart" value="<%= typeof syncCart !== 'undefined' && syncCart ? '1' : '0' %>">
         <input id="log_pass" type="password" name="password" placeholder="password"/>
         <a href="/forget-password"><button id="forget-button" type="button">Forget Password??</button></a>
         <a href="/dashboard/:name"><button id="log_submit" type="submit">Submit</button></a>

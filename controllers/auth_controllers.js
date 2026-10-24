@@ -1,20 +1,22 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 const router = express.Router();
 const crypto = require('crypto');
 const cookie_parser = require('cookie-parser');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const User = require('../models/user');
+const { sendEmail } = require('../config/mailjet.js');
 
 router.use(express.json());
 router.use(express.urlencoded({ extended : true }));
 router.use(cookie_parser());
 
-router.get('/login',(req,res)=>{
-   return res.render("login");
-})
+router.get('/login', (req, res) => {
+    return res.render('login', {
+        syncCart: req.query.syncCart === '1'
+    });
+});
 
 router.get('/signin',(req,res)=>{
     res.render("signin");
@@ -88,6 +90,9 @@ router.post('/login', async (req,res)=>{
         httpOnly : true
     });
 
+    if (req.body.syncCart === '1') {
+        return res.redirect('/?syncCart=1');
+    }      
     res.redirect(`/dashboard`);
 });
 
@@ -108,13 +113,6 @@ router.post('/signin',async (req,res)=>{
     const verificationtokenExpiry = Date.now() + 10 * 60 * 1000;
 
     const verificationLink = `http://localhost:${process.env.PORT}/verify/${email}/${verificationtoken}`
-    const transporter = nodemailer.createTransport({
-        service : 'gmail',
-        auth : {
-            user : process.env.SENDER_EMAIL,
-            pass : process.env.PASSWORD
-        }
-    });
 
     await User.create({
         email,
@@ -123,12 +121,16 @@ router.post('/signin',async (req,res)=>{
     });
 
     try {
-        await transporter.sendMail({
-            from : process.env.SENDER_EMAIL,
-            to : email,
-            subject : 'We want to verify you',
-            html : `<h1>Click this link to proceed the verification ${verificationLink}`
-        })
+        const result = await sendEmail(
+            email,
+            'Email verification',
+            `Please verify your VELNORA account: ${verificationLink}`,
+            `<h1>Verify your VELNORA account</h1>
+            <p>Click below to verify your email:</p>
+            <a href="${verificationLink}">Verify Email</a>`
+        );
+        console.log(result);
+        return res.send('Verification email sent successfully. Please check your inbox.');
     }catch(error){
         await User.deleteOne({
             email,
@@ -181,16 +183,6 @@ router.post('/forget-password',async (req,res)=>{
         return res.send("Sorry, user doesn't exist");
     }
 
-    const nodemailerTransporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 2525,
-        secure: true,
-        auth : {
-            user : process.env.SENDER_EMAIL,
-            pass : process.env.PASSWORD
-        }
-    });
-
     const tokenn = crypto.randomBytes(32).toString('hex');
     const resetLink = `http://localhost:${process.env.PORT}/reset-password/${tokenn}`;
 
@@ -200,13 +192,16 @@ router.post('/forget-password',async (req,res)=>{
     await existingUser.save();
 
     try{
-        await nodemailerTransporter.sendMail({
-            from : process.env.SENDER_EMAIL,
-            to : existingUser.email,
-            subject : 'Reset your password',
-            text : `Click on the given link to reset your password. It will expire in 10 minutes ${resetLink}`,
-            html : `<h1>Click on the given link to reset your password. It will expire in 10 minutes ${resetLink}</h1>`
-        })
+        const result = await sendEmail(
+            recipient_email,
+            'Reset Your VELNORA Password',
+            `Reset your password for ${resetLink}`,
+            `<h1>RESET your password for VELNORA account</h1>
+            <p>Click below to change your password:</p>
+            <a href="${resetLink}">Reset Password</a>`
+        )
+        console.log(result);
+        return res.send('Verification email sent successfully. Please check your inbox.');
     }catch(error){
         existingUser.resetToken = undefined;
         existingUser.tokenExpiresAt = undefined
@@ -215,9 +210,6 @@ router.post('/forget-password',async (req,res)=>{
 
         return res.send("Couldn't reset your password");
     }
-
-    res.send('Reset link has been sent to you');
-
 });
 
 router.post('/reset-password/:token',async (req,res)=>{
@@ -242,7 +234,7 @@ router.post('/reset-password/:token',async (req,res)=>{
         existingUser.tokenExpiresAt = undefined;
 
         await existingUser.save();
-        return res.send('Password changed successfully, You can now login. ');
+        return res.redirect('/login');
     }
     else{
         return res.send('Invalid or expired reset link');

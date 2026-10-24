@@ -28,20 +28,27 @@ app.get('/',async (req,res)=>{
         let isLoggedin = false;
         const token = req.cookies?.Access_Token;
 
-        if(token){
-            const verified = JsonWebTokenError.verify(token,process.env.JWT_SECRET);
-            isLoggedin = true;
-        }else{
-            isLoggedin = false;
+        if (token) {
+            try {
+                jwt.verify(token, process.env.JWT_SECRET);
+                isLoggedin = true;
+            } catch (error) {
+                isLoggedin = false;
+
+                if (error.name === 'TokenExpiredError') {
+                    res.clearCookie('Access_Token');
+                }
+            }
         }
 
         res.render('mainDash' ,  { 
             Products,
-            isLoggedin
+            isLoggedin,
+            syncAfterLogin: req.query.syncCart === '1'
         });
     }catch(error){
         console.log(error);
-        res.send(500).send('Unable to fetch products');
+        res.status(500).send('Unable to fetch products');
     } 
 });
 

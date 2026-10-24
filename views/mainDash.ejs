@@ -14,7 +14,7 @@
             <div id="btns">
                 <a href="/login"><span id="main_login_btn"><button>Login</button></a>
                 <a href="/signin"><span id="main_signin_btn"><button>Signin</button></a> 
-                <a href="/cart-page" id="cart_icon"> 🛒 Cart </a>
+                <button id="cart_icon"> 🛒 Cart</button> 
             </div>
         </div>
     </header>
@@ -31,19 +31,28 @@
 </body>
 <script>
     let cart_icon = document.getElementById("cart_icon");
-    cart_icon.addEventListener("click",async ()=>{
-        if(!isLoggedIn){
-            event.preventDefault();
-            await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Signup to see your cart",
-                footer: "Already have an account? <a href='/login'>Login</a>"
-            });
+    cart_icon.addEventListener("click",async (event)=>{
+
+        event.preventDefault();
+
+    if (!isLoggedIn) {
+        const result = await Swal.fire({
+            icon: "warning",
+            title: "Login Required",
+            text: "Please login to see your cart",
+            showCancelButton: true,
+            confirmButtonText: "Login",
+            cancelButtonText: "Cancel"
+        });
+
+        if (result.isConfirmed) {
+            window.location.href = "/login?syncCart=1";
         }
-        else{
-            syncCart();
-        }
+
+        return;
+    }
+
+    await syncCart();
     });
 
     function getGuestCart(){
@@ -92,32 +101,40 @@
             const carts = await getGuestCart();
 
             if(carts.length === 0){
-                return res.send('Cart is empty');
+                window.location.href = '/cart-page';
+                return;
             }
 
-            const result = fetch('/sync-cart',{
+            const result = await fetch('/sync-cart',{
                     method : 'POST',
                     headers : {
                      'Content-Type' : 'application/json'
                     },
-                    body : JSON.stringify(carts)
+                    body : JSON.stringify({ carts })
             });
 
-            const response = await result.josn();
+            const response = await result.json();
 
-            if(!response.ok){
+            if(!result.ok || !response.success){
                 console.log(result.message);
-                return res.send('Failed to fetch products');
+                return;
             }else{
                 localStorage.removeItem('Product');
-                return res.send('Products added successfully');
+                window.location.href = '/cart-page';
+                return ;
             }
         }catch(error){
-            return res.status(500).send('Internal server error');
+            return;
         }
         
     }
 
-    localStorage.clear();
+
+    const syncAfterLogin = <%- JSON.stringify( typeof syncAfterLogin !== 'undefined' && syncAfterLogin ) %>;
+
+    if (isLoggedIn && syncAfterLogin) {
+        syncCart();
+    }
+
 </script>
 </html>

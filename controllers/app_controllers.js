@@ -32,14 +32,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.get('/dashboard', async (req,res)=>{
+router.get('/dashboard',authenticated, async (req,res)=>{
     try{
         const products = await Product.find()
                     .sort({ _id : 1 })
                     .limit(4);
 
         res.render('dashboard' ,  { 
-            Products : products
+            Products : products,
+            name: req.user.name
         });
     }catch(error){
         console.log(error);
@@ -812,8 +813,10 @@ router.post('/verify-membership',authenticated,async(req,res)=>{
 router.post('/sync-cart',authenticated,async (req,res)=>{
     try{
         const syncCards = req.body.carts;
-        if(!Array.isArray){
+        const userId = req.user._id;
+        if(!Array.isArray(syncCards)){
             return res.status(400).json({
+                    success: 'false',
                     message: 'Invalid cart data'
                 });
         }
@@ -828,7 +831,7 @@ router.post('/sync-cart',authenticated,async (req,res)=>{
             }else{
                 await cartProducts.create({
                     userId : userId,
-                    productId : item._id,
+                    productId : item.productId,
                     image : item.image,
                     name : item.name,
                     description : item.description,
@@ -836,15 +839,18 @@ router.post('/sync-cart',authenticated,async (req,res)=>{
                     category : item.category,
                     quantity : Number(item.quantity) || 1
                 });
-
-                return res.status(200).json({
+            }
+            return res.status(200).json({
+                    success : "true",
                     message : 'Cart created successfully'
                 });
-            }
         }
     }catch(error){
         console.log(error.message);
-        return res.status(500).send('There is a server issue');
+        return res.status(500).json({
+            success: false,
+            message: 'Unable to sync cart'
+        });
     }
     
 })
