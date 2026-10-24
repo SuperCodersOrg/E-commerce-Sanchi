@@ -137,6 +137,15 @@ Make sure your MongoDB Atlas connection is configured correctly and your databas
 8. Complete the payment process, when applicable.
 9. View orders in the order history section.
 
+## Membership Workflow
+1. Open the membership section.
+2. Explore the available membership plans.
+3. Compare plan pricing and benefits.
+4. Select a preferred plan.
+5. Complete the membership purchase process, if payment is required.
+6. Record the membership details and payment status.
+7. Check membership status and access any benefits implemented for the selected plan.
+
 ## Environment Variables
 | Variable | Description |
 |---|---|
