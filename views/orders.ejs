@@ -128,8 +128,6 @@
                 body : JSON.stringify({ shippingAddress })
             }).then((response)=>{return response.json()})
             .then((data)=>{
-                console.log(data);
-                console.log(data.key);
                 const options = {
                     key : data.key,
                     amount : data.amount,
@@ -156,6 +154,7 @@
 
                         if (result.ok) {
                             alert('Payment verified successfully!');
+                            window.location.href = '/dashboard';                            
                         } else {
                             alert(data.message || 'Payment verification failed');
                         }

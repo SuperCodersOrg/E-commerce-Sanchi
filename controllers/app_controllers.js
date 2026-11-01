@@ -169,20 +169,25 @@ router.get('/buyers-details',authenticated,async (req,res)=>{
 
 router.get('/orders-review',authenticated,async (req,res)=>{
     try{
-
         const ordersLists = await order.find()
                             .populate('items.productId')
                             .sort({ createdAt : -1 });
         
         return res.render('adminDashboard' , {  page : 'orders' , ordersLists });
-
     }catch(error){
-
         console.log(error.message);
         return res.status(500).send('Server Error');
-
     }
 });
+
+router.get('/inventory',authenticated,async (req,res)=>{
+    try{
+        const products = await Product.find();
+        return res.render('adminDashboard', { page : 'inventory' , products });
+    }catch(error){
+        return res.status(500).send('Cannot redirect to inventory');
+    }
+})
 
 router.get('/admin-profile',authenticated,async (req,res)=>{
     try{
@@ -360,7 +365,6 @@ router.get('/plans',authenticated,async(req, res) => {
 
 router.get('/membership-dashboard',authenticated,async(req,res)=>{
     try{
-
         const subscription = await Subscription.findOne({
             userId : req.user._id,
             paymentStatus : 'paid'
@@ -417,7 +421,12 @@ router.post('/add-to-cart',authenticated,async (req,res)=>{
             productId : cardId
         });
 
-        if(!alreadyInCart){
+        const stock = card.stock;
+        if(stock <= 0){
+            return res.status(400).send('Out of stock');
+        }
+
+        if(!alreadyInCart && stock > 0){
             await cartProducts.create({
             userId : userId,
             productId : card._id,
@@ -450,20 +459,50 @@ router.post('/removeCart',authenticated,async (req,res)=>{
 router.post('/add-quantity',authenticated,async (req,res)=>{
     const id = req.body.userId;
     try{
+        const product = await cartProducts.findOne({ userId : id });
+        if(!product){
+            return res.status(404).json({ message: 'Cart item not found' });
+        }
+
+        const productId = product.productId;
+        const stockProduct = await Product.findById(productId);
+        if (!stockProduct) { 
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        if(product.quantity >= stockProduct.stock){
+            return res.status(400).json({ message: 'Available stock limit reached' });
+        }
+
         const result = await cartProducts.findOneAndUpdate(
             { userId : id },
             { $inc : { quantity : 1 } },
             { new : true }
         );
-        res.status(200).json({ quantity : result.quantity });
+        res.status(200).json({ message : 'Quantity updated successfully' });
     }catch(error){
-        res.status(500).send('Unable to update quantity');
+        res.status(500).json({ message : 'Unable to update quantity' });
     }
 });
 
 router.post('/dec-quantity',authenticated,async (req,res)=>{
     const id = req.body.userId;
     try{
+        const product = await cartProducts.findOne({ userId : id });
+        if(!product){
+            return res.status(404).json({ message: 'Cart item not found' });
+        }
+
+        const productId = product.productId;
+        const stockProduct = await Product.findById(productId);
+        if (!stockProduct) { 
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        if(product.quantity <= 1){
+            return res.status(400).json({ message: 'Quantity cannot be less than 1' });
+        }
+
         const result = await cartProducts.findOneAndUpdate(
             { userId : id },
             { $inc : { quantity : -1 } },
@@ -471,12 +510,12 @@ router.post('/dec-quantity',authenticated,async (req,res)=>{
         );
         if(result.quantity <= 0){
             await cartProducts.deleteOne({ userId : id });
-            res.status(200).json({quantity : 0});
+            res.status(200).json({ message: 'Item removed from cart' });
         }else{
-            res.status(200).json({quantity : result.quantity});
+            res.status(200).json({ message: 'Quantity updated successfully' });
         }
     }catch(error){
-        res.status(500).send('Unable to update quantity');
+        res.status(500).json({ message : 'Unable to update quantity' });
     }
 });
 
@@ -502,7 +541,7 @@ router.post('/place-order',authenticated,async (req,res)=>{
     try {
         const { fullName , phone , address , city , pincode , state } = req.body;
 
-        const cartProduct = await cartProducts.find();
+        const cartProduct = await cartProducts.find({ userId: req.user._id });
         const items = cartProduct.map((item)=>({
             productId : item.productId,
             quantity : item.quantity,
@@ -544,6 +583,20 @@ router.post('/place-order',authenticated,async (req,res)=>{
             paymentStatus : 'pending',
             orderStatus : 'confirmed'
         });
+
+        const stockProduct = await Product.find({ _id : { $in : items.map(item => item.productId) } });
+
+        for(const item of items){
+            let product = stockProduct.find(p => p._id.toString() == item.productId.toString());
+
+            if (!product || product.stock < item.quantity) {
+                return res.status(400).send( 'Insufficient stock for a product');
+            }
+
+            product.stock = product.stock - item.quantity;
+
+            await product.save();
+        }
 
         await cartProducts.deleteMany({
             userId : req.user._id
@@ -653,7 +706,20 @@ router.post('/verify-razorpay-payment', authenticated, async (req, res) => {
 
         await savedOrder.save();
 
-        await cartProducts.deleteMany({});
+        const stockProduct = await Product.find({ _id : { $in : savedOrder.items.map(item => item.productId)}});
+        for(const item of savedOrder.items){
+            const product = await stockProduct.find(p => p._id.toString() === item.productId.toString());
+            if(!product || product.stock < item.quantity){
+                return res.json({
+                    success: false,
+                    message: 'Insufficient stock for a product'
+                })
+            }
+            product.stock = product.stock - item.quantity;
+            await product.save();
+        }
+
+        await cartProducts.deleteMany({ userId : req.user._id });
 
         return res.status(200).json({
             success: true,
@@ -681,6 +747,7 @@ router.post('/add-product',authenticated,upload.single('file'),async (req,res)=>
             productPrice ,
             productBrand ,
             productCategory ,
+            productStocks,
             sizes
         } = req.body;
 
@@ -693,12 +760,13 @@ router.post('/add-product',authenticated,upload.single('file'),async (req,res)=>
             price : productPrice ,
             brand : productBrand ,
             category : productCategory ,
+            stocks : productStocks,
             size: sizes.split(',').map(item => item.trim()),
             image: image ? `/images/${image.filename}` : null
         })
 
         console.log("Added");
-        return res.status(201).redirect('dashboard');
+        return res.status(201).redirect('admin-dashboard');
 
     }catch(error){
         console.log(error.message);
@@ -854,5 +922,64 @@ router.post('/sync-cart',authenticated,async (req,res)=>{
     }
     
 })
+
+router.post('/update-stock/:id',authenticated,async(req,res)=>{
+    const { stock } = req.body;
+    const productId = req.params.id;
+    console.log(stock,productId);
+
+    try{
+        const admin = await Users.findOne({
+            _id: req.user._id,
+            isAdmin: true
+        });
+
+        if (!admin) {
+            return res.status(403).send('Access denied');
+        }
+
+        const products = await Product.findById(productId);
+
+        if(!products){
+            return res.status(404).send("No product found");
+        }
+
+        products.stock = Number(stock);
+        await products.save();
+
+        return res.redirect('/inventory');
+    }catch(error){
+        return res.status(500).send('Stock value cannot be updated');
+    }
+
+});
+
+router.delete('/delete-product',authenticated,async(req,res)=>{
+    const { productID } = req.body;
+    console.log(productID)
+
+        try {
+            const admin = await Users.findOne({ 
+                _id: req.user._id,
+                isAdmin: true
+            });
+
+            if (!admin) {
+                return res.status(403).json({ message: 'Access denied' });
+            }
+
+            const product = await Product.findByIdAndDelete(productID);
+
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+
+            return res.status(200).json({ message: 'Product deleted successfully' });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message : 'Failed to delete product' });
+        }
+});
 
 module.exports = router;

@@ -11,8 +11,8 @@
         <main class="product_details">
             <div id="product_details_left">
                 <img src="<%= product.image %>" alt="<%= product.description %>"/>
-                <h2><%= product.name %></h3>
-                <h3><%= product.title %></h2>
+                <h2><%= product.name %></h2>
+                <h3><%= product.title %></h3>
             </div>
             <div id="product_details_right">
                 <div id="product_breadcrumb"> VELNORA / <%= product.category %> </div>
@@ -23,6 +23,11 @@
                     <% product.size.forEach((size)=>{ %>
                         <span class="size"><%= size %></span>
                     <% }) %>
+                </div>
+                <div id="stocks">Stock: <%= product.stock %></div>
+                <div id="out">
+                    <div id="outOfStockIcon" hidden>Our of Stock</div>
+                    <button id="notifyBtn" hidden>Notify Me</button>
                 </div>
                 <button class="add_to_cart" data-id="<%= product._id %>">Add To Cart</button>
                 <div id="brand">Brand: <%= product.brand %></div>   
@@ -43,5 +48,15 @@
             body : JSON.stringify({ _id : cardId })
         });
     });
+
+    let outOfStockIcon = document.getElementById('outOfStockIcon');
+    let stocks = document.getElementById('stocks');
+    let notifyBtn = document.getElementById('notifyBtn');
+    if(stocks.innerText === 'Stock: 0'){
+        cartButton.disabled = true;
+        outOfStockIcon.style.display = 'block';
+        stocks.style.display = 'none';
+        notifyBtn.style.display = 'block';
+    }
 </script>
 </html>

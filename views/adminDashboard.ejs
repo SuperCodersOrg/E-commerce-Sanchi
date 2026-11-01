@@ -38,6 +38,9 @@
                 <a href="/orders-review">🛒 Orders</a>
                 <hr>
 
+                <a href="/inventory">📦 Inventory</a>
+                <hr>
+
                 <a href="/admin-profile">👤 Profile</a>
             </nav>
         </aside>
@@ -163,6 +166,38 @@
                 </div>
 
             <% } %>
+
+            <% if(page == 'inventory') { %>
+                <h1>VELNORA -- Inventory</h1>
+
+                <div id="inventory-products">
+
+                    <% products.forEach((product)=>{ %>
+
+                        <div class="inventory-card" data-id="<%= product._id %>">
+                            <img src="<%= product.image %>" alt="<%= product.description %>">
+                            <div>
+                                <div id="title"><%= product.title %></div>
+                                <div id="category"><%= product.category %></div>
+                                <% if(product.stock == 0) { %>
+                                    <div id="outOfStock">Out Of Stock</div>
+                                <% } else { %>
+                                    <div id="productid"><%= product._id %></div>
+                                <% } %>
+                            </div>
+                            <div id="available">Available Stock: <%=product.stock %></div>
+                            <form method="POST" action="/update-stock/<%= product._id %>" id="updateStocks">
+                                <input type="number" name="stock" value="<%= product.stock %>">
+                                <button type="submit" id="stockBtn">Update</button>
+                            </form>    
+                            <button class="deleteBtn">Delete Product</button>
+                        </div>
+
+                    <% }) %>
+
+                </div>
+                
+            <% } %>
         </main>
 
     </div>
@@ -274,7 +309,27 @@
             const res = await fetch(`/analytics?range=${valueinDrop}`);
         });
 
-        
+        let deleteBtns = document.querySelectorAll(".deleteBtn");
+
+        deleteBtns.forEach((btn) => {
+        btn.addEventListener("click",async (event)=>{
+            let productID = event.target.closest('.inventory-card').getAttribute('data-id');
+            await fetch('/delete-product',{
+                method : 'DELETE',
+                headers : {
+                    'Content-Type' : 'application/json'
+                },
+                body : JSON.stringify({ productID : productID })
+            }).then((response)=>{
+                if(response.ok){
+                    alert('Product deleted successfully');
+                    location.reload();
+                }else{
+                    alert('Failed to delete product');
+                }
+            })
+        })
+        })
     
     </script>
 
